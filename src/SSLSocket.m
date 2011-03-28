@@ -75,6 +75,9 @@ static SSL_CTX *ctx;
 	SSL_CTX *ctx_ = ctx;
 	SSL *ssl_ = ssl;
 
+	[privateKeyFile release];
+	[certificateFile release];
+
 	[super dealloc];
 
 	if (ssl_ != NULL)
@@ -112,16 +115,28 @@ static SSL_CTX *ctx;
 {
 	SSLSocket *newsock = (SSLSocket*)[super accept];
 
-	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
-		[super close];
+	if ((newsock->ssl = SSL_new(ctx)) == NULL ||
+	    !SSL_set_fd(newsock->ssl, newsock->sock)) {
+		/* We only want to close the OFTCPSocket */
+		newsock->isa = [OFTCPSocket class];
+		[newsock close];
+		newsock->isa = isa;
+
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
 
-	SSL_set_accept_state(ssl);
+	SSL_set_accept_state(newsock->ssl);
 
-	if (SSL_connect(ssl) != 1) {
-		[super close];
+	if (!SSL_use_PrivateKey_file(newsock->ssl, [privateKeyFile cString],
+	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newsock->ssl,
+	    [certificateFile cString], SSL_FILETYPE_PEM) ||
+	    SSL_accept(newsock->ssl) != 1) {
+		/* We only want to close the OFTCPSocket */
+		newsock->isa = [OFTCPSocket class];
+		[newsock close];
+		newsock->isa = isa;
+
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
@@ -208,5 +223,29 @@ static SSL_CTX *ctx;
 					      requestedSize: size];
 
 	return ret;
+}
+
+- (void)setPrivateKeyFile: (OFString*)file
+{
+	OFString *old = privateKeyFile;
+	privateKeyFile = [file copy];
+	[old release];
+}
+
+- (OFString*)privateKeyFile
+{
+	return [[privateKeyFile copy] autorelease];
+}
+
+- (void)setCertificateFile: (OFString*)file
+{
+	OFString *old = certificateFile;
+	certificateFile = [file copy];
+	[old release];
+}
+
+- (OFString*)certificateFile
+{
+	return [[certificateFile copy] autorelease];
 }
 @end
