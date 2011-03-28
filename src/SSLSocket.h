@@ -4,9 +4,7 @@
 
 @interface SSLSocket: OFTCPSocket
 {
-	SSL_CTX *ctx;
 	SSL *ssl;
-	BOOL handsShaken;
 }
 
 - initWithSocket: (OFTCPSocket*)socket;

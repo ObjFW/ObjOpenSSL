@@ -18,6 +18,8 @@
 # define INVALID_SOCKET -1
 #endif
 
+static SSL_CTX *ctx;
+
 @implementation SSLSocket
 + (void)load
 {
@@ -26,29 +28,16 @@
 
 + (void)initialize
 {
-	if (self == [SSLSocket class])
-		SSL_library_init();
-}
+	if (self != [SSLSocket class])
+		return;
 
-- init
-{
-	self = [super init];
+	SSL_library_init();
 
-	@try {
-		if ((ctx = SSL_CTX_new(SSLv23_method())) == NULL)
-			@throw [OFInitializationFailedException
-			    newWithClass: isa];
+	if ((ctx = SSL_CTX_new(SSLv23_method())) == NULL)
+		@throw [OFInitializationFailedException newWithClass: self];
 
-		if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) &
-		    SSL_OP_NO_SSLv2) == 0)
-			@throw [OFInitializationFailedException
-			    newWithClass: isa];
-	} @catch (id e) {
-		[self release];
-		@throw e;
-	}
-
-	return self;
+	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) == 0)
+		@throw [OFInitializationFailedException newWithClass: self];
 }
 
 - initWithSocket: (OFTCPSocket*)socket
