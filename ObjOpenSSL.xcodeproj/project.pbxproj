@@ -1,0 +1,280 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD0AAEA1341289500445289 /* SSLSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BD0AAED1341289500445289 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BD0AAEB1341289500445289 /* SSLSocket.m */; };
+		4BD0AAEF134128B200445289 /* ObjFW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BD0AAEE134128B200445289 /* ObjFW.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4B1918EA1341272300D82152 /* ObjOpenSSL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjOpenSSL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BD0AAE91341286B00445289 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
+		4BD0AAEA1341289500445289 /* SSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLSocket.h; path = src/SSLSocket.h; sourceTree = SOURCE_ROOT; };
+		4BD0AAEB1341289500445289 /* SSLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SSLSocket.m; path = src/SSLSocket.m; sourceTree = SOURCE_ROOT; };
+		4BD0AAEE134128B200445289 /* ObjFW.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjFW.framework; path = Library/Frameworks/ObjFW.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4B1918E61341272300D82152 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BD0AAEF134128B200445289 /* ObjFW.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4B1918DE1341272300D82152 = {
+			isa = PBXGroup;
+			children = (
+				4B1918F31341272300D82152 /* ObjOpenSSL */,
+				4B1918EC1341272300D82152 /* Frameworks */,
+				4B1918EB1341272300D82152 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4B1918EB1341272300D82152 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4B1918EA1341272300D82152 /* ObjOpenSSL.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4B1918EC1341272300D82152 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4BD0AAEE134128B200445289 /* ObjFW.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4B1918F31341272300D82152 /* ObjOpenSSL */ = {
+			isa = PBXGroup;
+			children = (
+				4B1918F41341272300D82152 /* Supporting Files */,
+				4BD0AAEA1341289500445289 /* SSLSocket.h */,
+				4BD0AAEB1341289500445289 /* SSLSocket.m */,
+			);
+			path = ObjOpenSSL;
+			sourceTree = "<group>";
+		};
+		4B1918F41341272300D82152 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4BD0AAE91341286B00445289 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4B1918E71341272300D82152 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4B1918E91341272300D82152 /* ObjOpenSSL */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B1918FC1341272300D82152 /* Build configuration list for PBXNativeTarget "ObjOpenSSL" */;
+			buildPhases = (
+				4B1918E51341272300D82152 /* Sources */,
+				4B1918E61341272300D82152 /* Frameworks */,
+				4B1918E71341272300D82152 /* Headers */,
+				4B1918E81341272300D82152 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ObjOpenSSL;
+			productName = ObjOpenSSL;
+			productReference = 4B1918EA1341272300D82152 /* ObjOpenSSL.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4B1918E01341272300D82152 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 4B1918E31341272300D82152 /* Build configuration list for PBXProject "ObjOpenSSL" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4B1918DE1341272300D82152;
+			productRefGroup = 4B1918EB1341272300D82152 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B1918E91341272300D82152 /* ObjOpenSSL */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4B1918E81341272300D82152 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4B1918E51341272300D82152 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BD0AAED1341289500445289 /* SSLSocket.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4B1918FA1341272300D82152 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4B1918FB1341272300D82152 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4B1918FD1341272300D82152 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = 4.2;
+				INFOPLIST_FILE = Info.plist;
+				OTHER_CFLAGS = (
+					"-I/opt/local/include",
+					"-fconstant-string-class=OFConstantString",
+					"-fno-constant-cfstrings",
+				);
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcrypto",
+					"-lz",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+					"-Wshorten-64-to-32",
+					"-Wwrite-strings",
+					"-Wcast-align",
+					"-Wpointer-arith",
+				);
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		4B1918FE1341272300D82152 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = 4.2;
+				INFOPLIST_FILE = Info.plist;
+				OTHER_CFLAGS = (
+					"-I/opt/local/include",
+					"-fconstant-string-class=OFConstantString",
+					"-fno-constant-cfstrings",
+				);
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcrypto",
+					"-lz",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+					"-Wshorten-64-to-32",
+					"-Wwrite-strings",
+					"-Wcast-align",
+					"-Wpointer-arith",
+				);
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4B1918E31341272300D82152 /* Build configuration list for PBXProject "ObjOpenSSL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B1918FA1341272300D82152 /* Debug */,
+				4B1918FB1341272300D82152 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B1918FC1341272300D82152 /* Build configuration list for PBXNativeTarget "ObjOpenSSL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B1918FD1341272300D82152 /* Debug */,
+				4B1918FE1341272300D82152 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4B1918E01341272300D82152 /* Project object */;
+}
