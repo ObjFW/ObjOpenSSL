@@ -5,7 +5,7 @@ LIB_MINOR = 0
 CPPFLAGS += -Wall -g
 LIBS += -lssl -lcrypto -lz
 
-includedir = ObjGnuOpenSSL
+includedir = ObjOpenSSL
 prefix ?= /usr/local
 INSTALL ?= install
 
