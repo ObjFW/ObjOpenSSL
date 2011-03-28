@@ -7,7 +7,7 @@
 #import "SSLSocket.h"
 
 #import <ObjFW/OFAcceptFailedException.h>
-#import <ObjFw/OFConnectionFailedException.h>
+#import <ObjFW/OFConnectionFailedException.h>
 #import <ObjFW/OFInitializationFailedException.h>
 #import <ObjFW/OFNotConnectedException.h>
 #import <ObjFW/OFOutOfRangeException.h>
