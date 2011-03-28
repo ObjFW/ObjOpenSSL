@@ -9,6 +9,8 @@
 	BOOL handsShaken;
 }
 
+- initWithSocket: (OFTCPSocket*)socket;
+
 /* Change the return type */
 - (SSLSocket*)accept;
 @end

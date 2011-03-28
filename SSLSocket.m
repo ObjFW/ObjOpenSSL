@@ -1,4 +1,6 @@
+#include <unistd.h>
 #include <errno.h>
+#include <assert.h>
 
 #import <ObjFW/OFHTTPRequest.h>
 
@@ -37,10 +39,40 @@
 			@throw [OFInitializationFailedException
 			    newWithClass: isa];
 
-//		if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) &
-//		    SSL_OP_NO_SSLv2) == 0)
-//			@throw [OFInitializationFailedException
-//			    newWithClass: isa];
+		if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) &
+		    SSL_OP_NO_SSLv2) == 0)
+			@throw [OFInitializationFailedException
+			    newWithClass: isa];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
+
+	return self;
+}
+
+- initWithSocket: (OFTCPSocket*)socket
+{
+	self = [self init];
+
+	@try {
+		sock = dup(socket->sock);
+
+		if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
+			close(sock);
+			sock = INVALID_SOCKET;
+			@throw [OFInitializationFailedException
+			    newWithClass: isa];
+		}
+
+		SSL_set_connect_state(ssl);
+
+		if (SSL_connect(ssl) != 1) {
+			close(sock);
+			sock = INVALID_SOCKET;
+			@throw [OFInitializationFailedException
+			    newWithClass: isa];
+		}
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -69,7 +101,7 @@
 		      onPort: port];
 
 	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
-		[self close];
+		[super close];
 		@throw [OFConnectionFailedException newWithClass: isa
 							  socket: self
 							    host: host
@@ -79,7 +111,7 @@
 	SSL_set_connect_state(ssl);
 
 	if (SSL_connect(ssl) != 1) {
-		[self close];
+		[super close];
 		@throw [OFConnectionFailedException newWithClass: isa
 							  socket: self
 							    host: host
@@ -92,7 +124,7 @@
 	SSLSocket *newsock = (SSLSocket*)[super accept];
 
 	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
-		[self close];
+		[super close];
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
@@ -100,7 +132,7 @@
 	SSL_set_accept_state(ssl);
 
 	if (SSL_connect(ssl) != 1) {
-		[self close];
+		[super close];
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
