@@ -225,6 +225,11 @@ static SSL_CTX *ctx;
 	return ret;
 }
 
+- (size_t)pendingBytes
+{
+	return [super pendingBytes] + SSL_pending(ssl);
+}
+
 - (void)setPrivateKeyFile: (OFString*)file
 {
 	OFString *old = privateKeyFile;
