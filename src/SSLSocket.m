@@ -13,6 +13,7 @@
 #import <ObjFW/OFOutOfRangeException.h>
 #import <ObjFW/OFReadFailedException.h>
 #import <ObjFW/OFWriteFailedException.h>
+#import <ObjFW/macros.h>
 
 #ifndef INVALID_SOCKET
 # define INVALID_SOCKET -1
@@ -113,35 +114,35 @@ static SSL_CTX *ctx;
 
 - (SSLSocket*)accept
 {
-	SSLSocket *newsock = (SSLSocket*)[super accept];
+	SSLSocket *newSocket = (SSLSocket*)[super accept];
 
-	if ((newsock->ssl = SSL_new(ctx)) == NULL ||
-	    !SSL_set_fd(newsock->ssl, newsock->sock)) {
+	if ((newSocket->ssl = SSL_new(ctx)) == NULL ||
+	    !SSL_set_fd(newSocket->ssl, newSocket->sock)) {
 		/* We only want to close the OFTCPSocket */
-		newsock->isa = [OFTCPSocket class];
-		[newsock close];
-		newsock->isa = isa;
+		newSocket->isa = [OFTCPSocket class];
+		[newSocket close];
+		newSocket->isa = isa;
 
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
 
-	SSL_set_accept_state(newsock->ssl);
+	SSL_set_accept_state(newSocket->ssl);
 
-	if (!SSL_use_PrivateKey_file(newsock->ssl, [privateKeyFile cString],
-	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newsock->ssl,
+	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile cString],
+	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newSocket->ssl,
 	    [certificateFile cString], SSL_FILETYPE_PEM) ||
-	    SSL_accept(newsock->ssl) != 1) {
+	    SSL_accept(newSocket->ssl) != 1) {
 		/* We only want to close the OFTCPSocket */
-		newsock->isa = [OFTCPSocket class];
-		[newsock close];
-		newsock->isa = isa;
+		newSocket->isa = [OFTCPSocket class];
+		[newSocket close];
+		newSocket->isa = isa;
 
 		@throw [OFAcceptFailedException newWithClass: isa
 						      socket: self];
 	}
 
-	return newsock;
+	return newSocket;
 }
 
 - (void)close
@@ -151,24 +152,24 @@ static SSL_CTX *ctx;
 	[super close];
 }
 
-- (size_t)_readNBytes: (size_t)size
-	   intoBuffer: (char*)buf
+- (size_t)_readNBytes: (size_t)length
+	   intoBuffer: (char*)buffer
 {
 	ssize_t ret;
 
-	if (size > INT_MAX)
+	if (length > INT_MAX)
 		@throw [OFOutOfRangeException newWithClass: isa];
 
 	if (sock == INVALID_SOCKET)
 		@throw [OFNotConnectedException newWithClass: isa
 						      socket: self];
 
-	if (eos) {
+	if (isAtEndOfStream) {
 		OFReadFailedException *e;
 
 		e = [OFReadFailedException newWithClass: isa
 						 stream: self
-					  requestedSize: size];
+					requestedLength: length];
 #ifndef _WIN32
 		e->errNo = ENOTCONN;
 #else
@@ -178,35 +179,35 @@ static SSL_CTX *ctx;
 		@throw e;
 	}
 
-	if ((ret = SSL_read(ssl, buf, (int)size)) < 0)
+	if ((ret = SSL_read(ssl, buffer, (int)length)) < 0)
 		@throw [OFReadFailedException newWithClass: isa
 						    stream: self
-					     requestedSize: size];
+					   requestedLength: length];
 
 	if (ret == 0)
-		eos = YES;
+		isAtEndOfStream = YES;
 
 	return ret;
 }
 
-- (size_t)_writeNBytes: (size_t)size
-	    fromBuffer: (const char*)buf
+- (size_t)_writeNBytes: (size_t)length
+	    fromBuffer: (const char*)buffer
 {
 	ssize_t ret;
 
-	if (size > INT_MAX)
+	if (length > INT_MAX)
 		@throw [OFOutOfRangeException newWithClass: isa];
 
 	if (sock == INVALID_SOCKET)
 		@throw [OFNotConnectedException newWithClass: isa
 						      socket: self];
 
-	if (eos) {
+	if (isAtEndOfStream) {
 		OFWriteFailedException *e;
 
 		e = [OFWriteFailedException newWithClass: isa
 						  stream: self
-					   requestedSize: size];
+					 requestedLength: length];
 
 #ifndef _WIN32
 		e->errNo = ENOTCONN;
@@ -217,10 +218,10 @@ static SSL_CTX *ctx;
 		@throw e;
 	}
 
-	if ((ret = SSL_write(ssl, buf, (int)size)) < 1)
+	if ((ret = SSL_write(ssl, buffer, (int)length)) < 1)
 		@throw [OFWriteFailedException newWithClass: isa
 						     stream: self
-					      requestedSize: size];
+					    requestedLength: length];
 
 	return ret;
 }
@@ -232,25 +233,21 @@ static SSL_CTX *ctx;
 
 - (void)setPrivateKeyFile: (OFString*)file
 {
-	OFString *old = privateKeyFile;
-	privateKeyFile = [file copy];
-	[old release];
+	OF_SETTER(privateKeyFile, file, YES, YES)
 }
 
 - (OFString*)privateKeyFile
 {
-	return [[privateKeyFile copy] autorelease];
+	OF_GETTER(privateKeyFile, YES)
 }
 
 - (void)setCertificateFile: (OFString*)file
 {
-	OFString *old = certificateFile;
-	certificateFile = [file copy];
-	[old release];
+	OF_SETTER(certificateFile, file, YES, YES)
 }
 
 - (OFString*)certificateFile
 {
-	return [[certificateFile copy] autorelease];
+	OF_GETTER(certificateFile, YES)
 }
 @end
