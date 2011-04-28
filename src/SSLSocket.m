@@ -73,7 +73,6 @@ static SSL_CTX *ctx;
 
 - (void)dealloc
 {
-	SSL_CTX *ctx_ = ctx;
 	SSL *ssl_ = ssl;
 
 	[privateKeyFile release];
@@ -83,8 +82,6 @@ static SSL_CTX *ctx;
 
 	if (ssl_ != NULL)
 		SSL_free(ssl_);
-	if (ctx_ != NULL)
-		SSL_CTX_free(ctx_);
 }
 
 - (void)connectToHost: (OFString*)host
