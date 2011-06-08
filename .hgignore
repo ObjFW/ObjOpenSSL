@@ -1,0 +1,10 @@
+syntax: glob
+*.dylib
+*.o
+*.so
+*~
+build
+ObjOpenSSL.xcodeproj/*.mode1v3
+ObjOpenSSL.xcodeproj/*.pbxuser
+ObjOpenSSL.xcodeproj/project.xcworkspace
+ObjOpenSSL.xcodeproj/xcuserdata
