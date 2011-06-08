@@ -85,10 +85,10 @@ static SSL_CTX *ctx;
 }
 
 - (void)connectToHost: (OFString*)host
-	       onPort: (uint16_t)port
+		 port: (uint16_t)port
 {
 	[super connectToHost: host
-		      onPort: port];
+			port: port];
 
 	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
 		[super close];
