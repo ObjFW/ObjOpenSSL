@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD0AAEA1341289500445289 /* SSLSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAED1341289500445289 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BD0AAEB1341289500445289 /* SSLSocket.m */; };
 		4BD0AAEF134128B200445289 /* ObjFW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BD0AAEE134128B200445289 /* ObjFW.framework */; };
@@ -14,6 +15,7 @@
 
 /* Begin PBXFileReference section */
 		4B1918EA1341272300D82152 /* ObjOpenSSL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjOpenSSL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjOpenSSL.h; path = src/ObjOpenSSL.h; sourceTree = SOURCE_ROOT; };
 		4BD0AAE91341286B00445289 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		4BD0AAEA1341289500445289 /* SSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLSocket.h; path = src/SSLSocket.h; sourceTree = SOURCE_ROOT; };
 		4BD0AAEB1341289500445289 /* SSLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SSLSocket.m; path = src/SSLSocket.m; sourceTree = SOURCE_ROOT; };
@@ -61,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				4B1918F41341272300D82152 /* Supporting Files */,
+				4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */,
 				4BD0AAEA1341289500445289 /* SSLSocket.h */,
 				4BD0AAEB1341289500445289 /* SSLSocket.m */,
 			);
@@ -82,6 +85,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */,
 				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
