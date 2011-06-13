@@ -79,7 +79,11 @@ static SSL_CTX *ctx;
 
 		SSL_set_connect_state(ssl);
 
-		if (SSL_connect(ssl) != 1) {
+		if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
+		    [privateKeyFile cString], SSL_FILETYPE_PEM)) ||
+		    (certificateFile != nil && !SSL_use_certificate_file(ssl,
+		    [certificateFile cString], SSL_FILETYPE_PEM)) ||
+		    SSL_connect(ssl) != 1) {
 			close(sock);
 			sock = INVALID_SOCKET;
 			@throw [OFInitializationFailedException
@@ -122,7 +126,11 @@ static SSL_CTX *ctx;
 
 	SSL_set_connect_state(ssl);
 
-	if (SSL_connect(ssl) != 1) {
+	if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
+	    [privateKeyFile cString], SSL_FILETYPE_PEM)) ||
+	    (certificateFile != nil && !SSL_use_certificate_file(ssl,
+	    [certificateFile cString], SSL_FILETYPE_PEM)) ||
+	    SSL_connect(ssl) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException newWithClass: isa
 							  socket: self
