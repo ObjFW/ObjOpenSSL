@@ -25,12 +25,14 @@
 #include <assert.h>
 
 #import <ObjFW/OFHTTPRequest.h>
+#import <ObjFW/OFDataArray.h>
 
 #import "SSLSocket.h"
 
 #import <ObjFW/OFAcceptFailedException.h>
 #import <ObjFW/OFConnectionFailedException.h>
 #import <ObjFW/OFInitializationFailedException.h>
+#import <ObjFW/OFInvalidArgumentException.h>
 #import <ObjFW/OFNotConnectedException.h>
 #import <ObjFW/OFOutOfRangeException.h>
 #import <ObjFW/OFReadFailedException.h>
@@ -276,5 +278,33 @@ static SSL_CTX *ctx;
 - (OFString*)certificateFile
 {
 	OF_GETTER(certificateFile, YES)
+}
+
+- (OFDataArray*)channelBindingDataWithType: (OFString*)type
+{
+	int length;
+	char buffer[64];
+	OFDataArray *data;
+
+	if (![type isEqual: @"tls-unique"])
+		@throw [OFInvalidArgumentException newWithClass: isa
+						       selector: _cmd];
+
+	if (SSL_session_reused(ssl) ^ !isListening) {
+		/*
+		 * We are either client or the session has been resumed
+		 * => we have sent the finished message
+		 */
+		length = SSL_get_finished(ssl, buffer, 64);
+	} else {
+		/* peer sent the finished message */
+		length = SSL_get_peer_finished(ssl, buffer, 64);
+	}
+
+	data = [OFDataArray dataArray];
+	[data addNItems: length
+	     fromCArray: buffer];
+
+	return data;
 }
 @end

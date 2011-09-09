@@ -43,4 +43,5 @@
 - (OFString*)privateKeyFile;
 - (void)setCertificateFile: (OFString*)file;
 - (OFString*)certificateFile;
+- (OFDataArray*)channelBindingDataWithType: (OFString*)type;
 @end
