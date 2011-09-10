@@ -17,7 +17,7 @@ LIB_FILE = ${LIB_PREFIX}${LIB}${LIB_SUFFIX}
 
 all:
 	objfw-compile --lib ${LIB_MAJOR}.${LIB_MINOR} ${CPPFLAGS} ${LIBS} \
-		-o ${LIB} src/*.m
+		-o ${LIB} -Wno-deprecated-declarations src/*.m
 
 install: install-lib install-headers
 
