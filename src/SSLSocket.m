@@ -245,7 +245,7 @@ static SSL_CTX *ctx;
 		@throw e;
 	}
 
-	if (SSL_write(ssl, buffer, (int)length) < 1)
+	if (SSL_write(ssl, buffer, (int)length) < length)
 		@throw [OFWriteFailedException newWithClass: isa
 						     stream: self
 					    requestedLength: length];
