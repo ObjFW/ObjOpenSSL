@@ -219,11 +219,9 @@ static SSL_CTX *ctx;
 	return ret;
 }
 
-- (size_t)_writeNBytes: (size_t)length
-	    fromBuffer: (const char*)buffer
+- (void)_writeNBytes: (size_t)length
+	  fromBuffer: (const char*)buffer
 {
-	ssize_t ret;
-
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException newWithClass: isa];
 
@@ -247,12 +245,10 @@ static SSL_CTX *ctx;
 		@throw e;
 	}
 
-	if ((ret = SSL_write(ssl, buffer, (int)length)) < 1)
+	if (SSL_write(ssl, buffer, (int)length) < 1)
 		@throw [OFWriteFailedException newWithClass: isa
 						     stream: self
 					    requestedLength: length];
-
-	return ret;
 }
 
 - (size_t)pendingBytes
