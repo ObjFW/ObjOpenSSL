@@ -82,9 +82,11 @@ static SSL_CTX *ctx;
 		SSL_set_connect_state(ssl);
 
 		if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-		    [privateKeyFile cString], SSL_FILETYPE_PEM)) ||
+		    [privateKeyFile cStringWithEncoding:
+		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
 		    (certificateFile != nil && !SSL_use_certificate_file(ssl,
-		    [certificateFile cString], SSL_FILETYPE_PEM)) ||
+		    [certificateFile cStringWithEncoding:
+		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
 		    SSL_connect(ssl) != 1) {
 			close(sock);
 			sock = INVALID_SOCKET;
@@ -129,10 +131,11 @@ static SSL_CTX *ctx;
 	SSL_set_connect_state(ssl);
 
 	if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-	    [privateKeyFile cString], SSL_FILETYPE_PEM)) ||
-	    (certificateFile != nil && !SSL_use_certificate_file(ssl,
-	    [certificateFile cString], SSL_FILETYPE_PEM)) ||
-	    SSL_connect(ssl) != 1) {
+	    [privateKeyFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    SSL_FILETYPE_PEM)) || (certificateFile != nil &&
+	    !SSL_use_certificate_file(ssl, [certificateFile
+	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    SSL_FILETYPE_PEM)) || SSL_connect(ssl) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException newWithClass: isa
 							  socket: self
@@ -158,10 +161,11 @@ static SSL_CTX *ctx;
 
 	SSL_set_accept_state(newSocket->ssl);
 
-	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile cString],
+	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile
+	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newSocket->ssl,
-	    [certificateFile cString], SSL_FILETYPE_PEM) ||
-	    SSL_accept(newSocket->ssl) != 1) {
+	    [certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    SSL_FILETYPE_PEM) || SSL_accept(newSocket->ssl) != 1) {
 		/* We only want to close the OFTCPSocket */
 		newSocket->isa = [OFTCPSocket class];
 		[newSocket close];
