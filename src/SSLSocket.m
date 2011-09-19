@@ -197,7 +197,7 @@ static SSL_CTX *ctx;
 		@throw [OFNotConnectedException newWithClass: isa
 						      socket: self];
 
-	if (isAtEndOfStream) {
+	if (atEndOfStream) {
 		OFReadFailedException *e;
 
 		e = [OFReadFailedException newWithClass: isa
@@ -218,7 +218,7 @@ static SSL_CTX *ctx;
 					   requestedLength: length];
 
 	if (ret == 0)
-		isAtEndOfStream = YES;
+		atEndOfStream = YES;
 
 	return ret;
 }
@@ -233,7 +233,7 @@ static SSL_CTX *ctx;
 		@throw [OFNotConnectedException newWithClass: isa
 						      socket: self];
 
-	if (isAtEndOfStream) {
+	if (atEndOfStream) {
 		OFWriteFailedException *e;
 
 		e = [OFWriteFailedException newWithClass: isa
@@ -290,7 +290,7 @@ static SSL_CTX *ctx;
 		@throw [OFInvalidArgumentException newWithClass: isa
 						       selector: _cmd];
 
-	if (SSL_session_reused(ssl) ^ !isListening) {
+	if (SSL_session_reused(ssl) ^ !listening) {
 		/*
 		 * We are either client or the session has been resumed
 		 * => we have sent the finished message
