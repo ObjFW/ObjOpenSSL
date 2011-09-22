@@ -59,10 +59,12 @@ static SSL_CTX *ctx;
 	SSL_library_init();
 
 	if ((ctx = SSL_CTX_new(SSLv23_method())) == NULL)
-		@throw [OFInitializationFailedException newWithClass: self];
+		@throw [OFInitializationFailedException
+		    exceptionWithClass: self];
 
 	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) == 0)
-		@throw [OFInitializationFailedException newWithClass: self];
+		@throw [OFInitializationFailedException
+		    exceptionWithClass: self];
 }
 
 - initWithSocket: (OFTCPSocket*)socket
@@ -76,7 +78,7 @@ static SSL_CTX *ctx;
 			close(sock);
 			sock = INVALID_SOCKET;
 			@throw [OFInitializationFailedException
-			    newWithClass: isa];
+			    exceptionWithClass: isa];
 		}
 
 		SSL_set_connect_state(ssl);
@@ -91,7 +93,7 @@ static SSL_CTX *ctx;
 			close(sock);
 			sock = INVALID_SOCKET;
 			@throw [OFInitializationFailedException
-			    newWithClass: isa];
+			    exceptionWithClass: isa];
 		}
 	} @catch (id e) {
 		[self release];
@@ -122,10 +124,10 @@ static SSL_CTX *ctx;
 
 	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
 		[super close];
-		@throw [OFConnectionFailedException newWithClass: isa
-							  socket: self
-							    host: host
-							    port: port];
+		@throw [OFConnectionFailedException exceptionWithClass: isa
+								socket: self
+								  host: host
+								  port: port];
 	}
 
 	SSL_set_connect_state(ssl);
@@ -137,10 +139,10 @@ static SSL_CTX *ctx;
 	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM)) || SSL_connect(ssl) != 1) {
 		[super close];
-		@throw [OFConnectionFailedException newWithClass: isa
-							  socket: self
-							    host: host
-							    port: port];
+		@throw [OFConnectionFailedException exceptionWithClass: isa
+								socket: self
+								  host: host
+								  port: port];
 	}
 }
 
@@ -155,8 +157,8 @@ static SSL_CTX *ctx;
 		[newSocket close];
 		newSocket->isa = isa;
 
-		@throw [OFAcceptFailedException newWithClass: isa
-						      socket: self];
+		@throw [OFAcceptFailedException exceptionWithClass: isa
+							    socket: self];
 	}
 
 	SSL_set_accept_state(newSocket->ssl);
@@ -171,8 +173,8 @@ static SSL_CTX *ctx;
 		[newSocket close];
 		newSocket->isa = isa;
 
-		@throw [OFAcceptFailedException newWithClass: isa
-						      socket: self];
+		@throw [OFAcceptFailedException exceptionWithClass: isa
+							    socket: self];
 	}
 
 	return newSocket;
@@ -191,18 +193,18 @@ static SSL_CTX *ctx;
 	ssize_t ret;
 
 	if (length > INT_MAX)
-		@throw [OFOutOfRangeException newWithClass: isa];
+		@throw [OFOutOfRangeException exceptionWithClass: isa];
 
 	if (sock == INVALID_SOCKET)
-		@throw [OFNotConnectedException newWithClass: isa
-						      socket: self];
+		@throw [OFNotConnectedException exceptionWithClass: isa
+							    socket: self];
 
 	if (atEndOfStream) {
 		OFReadFailedException *e;
 
-		e = [OFReadFailedException newWithClass: isa
-						 stream: self
-					requestedLength: length];
+		e = [OFReadFailedException exceptionWithClass: isa
+						       stream: self
+					      requestedLength: length];
 #ifndef _WIN32
 		e->errNo = ENOTCONN;
 #else
@@ -213,9 +215,9 @@ static SSL_CTX *ctx;
 	}
 
 	if ((ret = SSL_read(ssl, buffer, (int)length)) < 0)
-		@throw [OFReadFailedException newWithClass: isa
-						    stream: self
-					   requestedLength: length];
+		@throw [OFReadFailedException exceptionWithClass: isa
+							  stream: self
+						 requestedLength: length];
 
 	if (ret == 0)
 		atEndOfStream = YES;
@@ -227,17 +229,17 @@ static SSL_CTX *ctx;
 	  fromBuffer: (const void*)buffer
 {
 	if (length > INT_MAX)
-		@throw [OFOutOfRangeException newWithClass: isa];
+		@throw [OFOutOfRangeException exceptionWithClass: isa];
 
 	if (sock == INVALID_SOCKET)
-		@throw [OFNotConnectedException newWithClass: isa
-						      socket: self];
+		@throw [OFNotConnectedException exceptionWithClass: isa
+							    socket: self];
 
 	if (atEndOfStream) {
 		OFWriteFailedException *e;
 
-		e = [OFWriteFailedException newWithClass: isa
-						  stream: self
+		e = [OFWriteFailedException exceptionWithClass: isa
+							stream: self
 					 requestedLength: length];
 
 #ifndef _WIN32
@@ -250,9 +252,9 @@ static SSL_CTX *ctx;
 	}
 
 	if (SSL_write(ssl, buffer, (int)length) < length)
-		@throw [OFWriteFailedException newWithClass: isa
-						     stream: self
-					    requestedLength: length];
+		@throw [OFWriteFailedException exceptionWithClass: isa
+							   stream: self
+						  requestedLength: length];
 }
 
 - (size_t)pendingBytes
@@ -287,8 +289,8 @@ static SSL_CTX *ctx;
 	OFDataArray *data;
 
 	if (![type isEqual: @"tls-unique"])
-		@throw [OFInvalidArgumentException newWithClass: isa
-						       selector: _cmd];
+		@throw [OFInvalidArgumentException exceptionWithClass: isa
+							     selector: _cmd];
 
 	if (SSL_session_reused(ssl) ^ !listening) {
 		/*
