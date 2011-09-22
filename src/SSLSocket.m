@@ -186,7 +186,7 @@ static SSL_CTX *ctx;
 }
 
 - (size_t)_readNBytes: (size_t)length
-	   intoBuffer: (char*)buffer
+	   intoBuffer: (void*)buffer
 {
 	ssize_t ret;
 
@@ -224,7 +224,7 @@ static SSL_CTX *ctx;
 }
 
 - (void)_writeNBytes: (size_t)length
-	  fromBuffer: (const char*)buffer
+	  fromBuffer: (const void*)buffer
 {
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException newWithClass: isa];
