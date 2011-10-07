@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Jonathan Schleifer <js@webkeks.org>
  *
- * https://webkeks.org/hg/objxmpp/
+ * https://webkeks.org/hg/objopenssl/
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
