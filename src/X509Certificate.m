@@ -104,30 +104,17 @@
 	OFMutableDictionary *dict = [OFMutableDictionary dictionary];
 
 	for (i = 0; i < count; i++) {
-		int len, buf_len = 256;
 		OFString *key, *value;
-		char *buf = [self allocMemoryWithSize: buf_len];
 		X509_NAME_ENTRY *entry = X509_NAME_get_entry(name, i);
 		ASN1_OBJECT *obj = X509_NAME_ENTRY_get_object(entry);
-		while ((len = OBJ_obj2txt(buf, buf_len, obj, 1)) > buf_len) {
-			buf_len = len;
-			[self resizeMemory: buf
-				    toSize: buf_len];
-		}
-		key = [OFString stringWithUTF8String: buf];
-		[self freeMemory: buf];
+		ASN1_STRING *str = X509_NAME_ENTRY_get_data(entry);
+		key = [self X509_stringFromASN1Object: obj];
 
 		if ([dict objectForKey: key] == nil)
 			[dict setObject: [OFList list]
 				 forKey: key];
 
-		if (ASN1_STRING_to_UTF8((unsigned char**)&buf,
-		    X509_NAME_ENTRY_get_data(entry)) < 0)
-			@throw [OFInvalidEncodingException
-				    exceptionWithClass: isa];
-		value = [OFString stringWithUTF8String: buf];
-		OPENSSL_free(buf);
-
+		value = [self X509_stringFromASN1String: str];
 		[[dict objectForKey: key] appendObject: value];
 	}
 
@@ -136,5 +123,32 @@
 	[pool release];
 
 	return [dict autorelease];
+}
+
+
+- (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj
+{
+	int len, buf_len = 256;
+	char *buf = [self allocMemoryWithSize: buf_len];
+	OFString *ret;
+	while ((len = OBJ_obj2txt(buf, buf_len, obj, 1)) > buf_len) {
+		buf_len = len;
+		[self resizeMemory: buf
+			    toSize: buf_len];
+	}
+	ret = [OFString stringWithUTF8String: buf];
+	[self freeMemory: buf];
+	return ret;
+}
+
+- (OFString*) X509_stringFromASN1String: (ASN1_STRING*)str
+{
+	char *buf;
+	OFString *ret;
+	if (ASN1_STRING_to_UTF8((unsigned char**)&buf, str) < 0)
+		@throw [OFInvalidEncodingException exceptionWithClass: isa];
+	ret = [OFString stringWithUTF8String: buf];
+	OPENSSL_free(buf);
+	return ret;
 }
 @end
