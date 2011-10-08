@@ -38,6 +38,7 @@
 - initWithStruct: (X509*)cert;
 - (OFDictionary*)issuer;
 - (OFDictionary*)subject;
+- (OFDictionary*)subjectAlternativeName;
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
 - (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
 - (OFString*) X509_stringFromASN1String: (ASN1_STRING*)str;

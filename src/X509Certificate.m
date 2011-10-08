@@ -21,6 +21,7 @@
  */
 
 #include <openssl/crypto.h>
+#include <openssl/x509v3.h>
 
 #import "X509Certificate.h"
 
@@ -94,6 +95,134 @@
 {
 	X509_NAME *name = X509_get_subject_name(crt);
 	return [self X509_dictionaryFromX509Name: name];
+}
+
+- (OFDictionary*)subjectAlternativeName
+{
+	int i = -1, j;
+	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	OFMutableDictionary *ret = [OFMutableDictionary dictionary];
+
+	while ((i = X509_get_ext_by_NID(crt, NID_subject_alt_name, i)) != -1) {
+		X509_EXTENSION *extension;
+		STACK_OF(GENERAL_NAME) *values;
+		int count;
+
+		extension = X509_get_ext(crt, i);
+		if (extension == NULL)
+			break;
+
+		values = X509V3_EXT_d2i(extension);
+		if (values == NULL)
+			break;
+
+		count = sk_GENERAL_NAME_num(values);
+		for (j = 0; j < count; j++) {
+			GENERAL_NAME *generalName;
+
+			generalName = sk_GENERAL_NAME_value(values, j);
+
+			switch(generalName->type) {
+			case GEN_OTHERNAME: {
+				OTHERNAME *otherName = generalName->d.otherName;
+				OFMutableDictionary *types;
+				OFList *list;
+				OFString *key;
+
+				types = [ret objectForKey: @"otherName"];
+				if (types == nil) {
+					types
+					    = [OFMutableDictionary dictionary];
+					[ret setObject: types
+						forKey: @"otherName"];
+				}
+
+				key = [self X509_stringFromASN1Object:
+					otherName->type_id];
+				list = [types objectForKey: key];
+				if (list == nil) {
+					list = [OFList list];
+					[types setObject: list
+						  forKey: key];
+				}
+
+				[list appendObject:
+				    [self X509_stringFromASN1String:
+					otherName->value->value.asn1_string]];
+				break;
+			}
+			case GEN_EMAIL: {
+				OFList *list;
+
+				list = [ret objectForKey: @"rfc822Name"];
+				if (list == nil) {
+					list = [OFList list];
+					[ret setObject: list
+						forKey: @"rfc822Name"];
+				}
+
+				[list appendObject:
+				    [self X509_stringFromASN1String:
+					generalName->d.rfc822Name]];
+				break;
+			}
+			case GEN_DNS: {
+				OFList *list;
+
+				list = [ret objectForKey: @"dNSName"];
+				if (list == nil) {
+					list = [OFList list];
+					[ret setObject: list
+						forKey: @"dNSName"];
+				}
+				[list appendObject:
+				    [self X509_stringFromASN1String:
+					generalName->d.dNSName]];
+				break;
+			}
+			case GEN_URI: {
+				OFList *list;
+
+				list = [ret objectForKey:
+					   @"uniformResourceIdentifier"];
+				if (list == nil) {
+					list = [OFList list];
+					[ret setObject: list
+						forKey:
+						  @"uniformResourceIdentifier"];
+				}
+				[list appendObject:
+				    [self X509_stringFromASN1String:
+				    generalName->d.uniformResourceIdentifier]];
+				break;
+			}
+			case GEN_IPADD: {
+				OFList *list;
+
+				list = [ret objectForKey: @"iPAddress"];
+				if (list == nil) {
+					list = [OFList list];
+					[ret setObject: list
+						forKey: @"iPAddress"];
+				}
+				[list appendObject:
+				    [self X509_stringFromASN1String:
+					generalName->d.iPAddress]];
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		i++; /* Next extension */
+	}
+
+	[ret makeImmutable];
+	[ret retain];
+	[pool release];
+
+	return [ret autorelease];
 }
 
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name
