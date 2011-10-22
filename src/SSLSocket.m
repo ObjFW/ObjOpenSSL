@@ -27,6 +27,8 @@
 #import <ObjFW/OFHTTPRequest.h>
 #import <ObjFW/OFDataArray.h>
 
+#include <openssl/crypto.h>
+
 #import "SSLSocket.h"
 
 #import <ObjFW/OFAcceptFailedException.h>
@@ -38,12 +40,28 @@
 #import <ObjFW/OFReadFailedException.h>
 #import <ObjFW/OFWriteFailedException.h>
 #import <ObjFW/macros.h>
+#import <ObjFW/threading.h>
 
 #ifndef INVALID_SOCKET
 # define INVALID_SOCKET -1
 #endif
 
 static SSL_CTX *ctx;
+static of_mutex_t *ssl_mutexes;
+
+static void
+ssl_locking_callback(int mode, int n, const char *file, int line)
+{
+	/*
+	 * This function must handle up to CRYPTO_num_locks() mutexes.
+	 * It must set the n-th lock if mode & CRYPTO_LOCK,
+	 * release it otherwise.
+	 */
+	if (mode & CRYPTO_LOCK)
+		of_mutex_lock(&ssl_mutexes[n]);
+	else
+		of_mutex_unlock(&ssl_mutexes[n]);
+}
 
 @implementation SSLSocket
 + (void)load
@@ -53,8 +71,20 @@ static SSL_CTX *ctx;
 
 + (void)initialize
 {
+	int m;
+
 	if (self != [SSLSocket class])
 		return;
+
+	CRYPTO_set_id_callback(&of_thread_current);
+
+	/* Generate number of mutexes needed */
+	m = CRYPTO_num_locks();
+	ssl_mutexes = malloc(m * sizeof(of_mutex_t));
+	for (m--; m >= 0; m--)
+		of_mutex_new(&ssl_mutexes[m]);
+
+	CRYPTO_set_locking_callback(&ssl_locking_callback);
 
 	SSL_library_init();
 
