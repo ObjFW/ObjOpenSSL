@@ -182,7 +182,8 @@ static SSL_CTX *ctx;
 
 - (void)close
 {
-	SSL_shutdown(ssl);
+	if (ssl != NULL)
+		SSL_shutdown(ssl);
 
 	[super close];
 }
