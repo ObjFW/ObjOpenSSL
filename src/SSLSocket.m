@@ -259,6 +259,9 @@ static SSL_CTX *ctx;
 
 - (size_t)pendingBytes
 {
+	if (ssl == NULL)
+		return [super pendingBytes];
+
 	return [super pendingBytes] + SSL_pending(ssl);
 }
 
