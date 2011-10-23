@@ -28,8 +28,11 @@
 #import <ObjFW/OFDataArray.h>
 
 #include <openssl/crypto.h>
+#include <openssl/err.h>
 
 #import "SSLSocket.h"
+#import "SSLInvalidCertificateException.h"
+#import "X509Certificate.h"
 
 #import <ObjFW/OFAcceptFailedException.h>
 #import <ObjFW/OFConnectionFailedException.h>
@@ -93,6 +96,10 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 		    exceptionWithClass: self];
 
 	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) == 0)
+		@throw [OFInitializationFailedException
+		    exceptionWithClass: self];
+
+	if (SSL_CTX_set_default_verify_paths(ctx) == 0)
 		@throw [OFInitializationFailedException
 		    exceptionWithClass: self];
 }
@@ -342,5 +349,28 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 	     fromCArray: buffer];
 
 	return data;
+}
+
+- (X509Certificate*)peerCertificate
+{
+	X509 *certificate = SSL_get_peer_certificate(ssl);
+	if (!certificate)
+		return nil;
+
+	return [[[X509Certificate alloc]
+		initWithStruct: certificate] autorelease];
+}
+
+- (void)verifyPeerCertificate
+{
+	unsigned long ret;
+	if ((SSL_get_peer_certificate(ssl) == NULL)
+	    || ((ret = SSL_get_verify_result(ssl)) != X509_V_OK)) {
+		const char *reason = X509_verify_cert_error_string(ret);
+		@throw [SSLInvalidCertificateException
+			exceptionWithClass: isa
+				    reason: [OFString
+						stringWithUTF8String: reason]];
+	}
 }
 @end

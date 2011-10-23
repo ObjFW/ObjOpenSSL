@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  *
  * https://webkeks.org/hg/objopenssl/
  *
@@ -20,32 +20,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <openssl/ssl.h>
+#import "SSLInvalidCertificateException.h"
+#import <ObjFW/OFNotImplementedException.h>
 
-#import <ObjFW/OFTCPSocket.h>
-
-@class X509Certificate;
-
-@interface SSLSocket: OFTCPSocket
+@implementation SSLInvalidCertificateException
++ exceptionWithClass: (Class)class_
+	      reason: (OFString*)reason_;
 {
-	SSL *ssl;
-	OFString *privateKeyFile;
-	OFString *certificateFile;
+	return [[self alloc] initWithClass: class_
+				    reason: reason_];
 }
 
-#ifdef OF_HAVE_PROPERTIES
-@property (copy) OFString *privateKeyFile;
-@property (copy) OFString *certificateFile;
-#endif
+- initWithClass: (Class)class_
+{
+	Class c = isa;
+	[self release];
+	@throw [OFNotImplementedException exceptionWithClass: c
+						    selector: _cmd];
+}
 
-- initWithSocket: (OFTCPSocket*)socket;
-/* Change the return type */
-- (SSLSocket*)accept;
-- (void)setPrivateKeyFile: (OFString*)file;
-- (OFString*)privateKeyFile;
-- (void)setCertificateFile: (OFString*)file;
-- (OFString*)certificateFile;
-- (OFDataArray*)channelBindingDataWithType: (OFString*)type;
-- (X509Certificate*)peerCertificate;
-- (void)verifyPeerCertificate;
+- initWithClass: (Class)class_
+	 reason: (OFString*)reason_
+{
+	self = [super initWithClass: class_];
+
+	@try {
+		reason = [reason_ copy];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
+
+	return self;
+}
+
+- (void)dealloc
+{
+	[reason release];
+
+	[super dealloc];
+}
+
+- (OFString*)description
+{
+	if (description != nil)
+		return description;
+
+	description = [[OFString alloc] initWithFormat:
+		@"Invalid certificate, Reason: %@!", reason];
+
+	return description;
+}
+
+- (OFString*)reason
+{
+	return reason;
+}
 @end

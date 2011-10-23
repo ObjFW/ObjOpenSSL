@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  *
  * https://webkeks.org/hg/objopenssl/
  *
@@ -20,32 +20,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <openssl/ssl.h>
+#import <ObjFW/OFString.h>
+#import <ObjFW/OFException.h>
 
-#import <ObjFW/OFTCPSocket.h>
-
-@class X509Certificate;
-
-@interface SSLSocket: OFTCPSocket
+@interface SSLInvalidCertificateException: OFException
 {
-	SSL *ssl;
-	OFString *privateKeyFile;
-	OFString *certificateFile;
+	OFString *reason;
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property (copy) OFString *privateKeyFile;
-@property (copy) OFString *certificateFile;
+@property (readonly, nonatomic) OFString *reason;
 #endif
 
-- initWithSocket: (OFTCPSocket*)socket;
-/* Change the return type */
-- (SSLSocket*)accept;
-- (void)setPrivateKeyFile: (OFString*)file;
-- (OFString*)privateKeyFile;
-- (void)setCertificateFile: (OFString*)file;
-- (OFString*)certificateFile;
-- (OFDataArray*)channelBindingDataWithType: (OFString*)type;
-- (X509Certificate*)peerCertificate;
-- (void)verifyPeerCertificate;
++ exceptionWithClass: (Class)class
+	      reason: (OFString*)reason;
+- initWithClass: (Class)class
+	 reason: (OFString*)reason;
+- (OFString*)reason;
 @end
