@@ -35,7 +35,7 @@
 #endif
 
 - initWithFile: (OFString*)file;
-- initWithStruct: (X509*)cert;
+- initWithX509Struct: (X509*)cert;
 - (OFDictionary*)issuer;
 - (OFDictionary*)subject;
 - (OFDictionary*)subjectAlternativeName;

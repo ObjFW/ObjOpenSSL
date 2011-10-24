@@ -60,7 +60,7 @@
 	return self;
 }
 
-- initWithStruct: (X509*)cert
+- initWithX509Struct: (X509*)cert
 {
 	self = [self init];
 

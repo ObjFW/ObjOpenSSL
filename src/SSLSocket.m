@@ -358,7 +358,7 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 		return nil;
 
 	return [[[X509Certificate alloc]
-		initWithStruct: certificate] autorelease];
+		initWithX509Struct: certificate] autorelease];
 }
 
 - (void)verifyPeerCertificate
