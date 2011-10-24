@@ -27,8 +27,8 @@
 + exceptionWithClass: (Class)class_
 	      reason: (OFString*)reason_;
 {
-	return [[self alloc] initWithClass: class_
-				    reason: reason_];
+	return [[[self alloc] initWithClass: class_
+				     reason: reason_] autorelease];
 }
 
 - initWithClass: (Class)class_
