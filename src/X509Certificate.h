@@ -25,6 +25,19 @@
 #import <ObjFW/OFObject.h>
 @class OFDictionary;
 
+/* OIDs: */
+#define OID_commonName @"2.5.4.3"
+#define OID_surname @"2.5.4.4"
+#define OID_serialNumber @"2.5.4.5"
+#define OID_countryName @"2.5.4.6"
+#define ID_localityName @"2.5.4.7"
+#define OID_stateOrProvinceName @"2.5.4.8"
+#define OID_streetAddress @"2.5.4.9"
+#define OID_organizationName @"2.5.4.10"
+#define OID_organizationalUnitName  @"2.5.4.11"
+
+#define OID_SRVName @"1.3.6.1.5.5.7.8.7"
+
 @interface X509Certificate: OFObject
 {
 	X509 *crt;
