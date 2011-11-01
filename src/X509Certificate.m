@@ -241,6 +241,108 @@
 	return (subjectAlternativeName = ret);
 }
 
+- (BOOL)hasCommonNameMatchingDomain: (OFString*)domain
+{
+	OFString *name;
+	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	OFList *CNs = [[self subject] objectForKey: OID_commonName];
+
+	for (name in CNs) {
+		if ([self X509_isAssertedDomain: name
+				    equalDomain: domain]) {
+			[pool release];
+			return YES;
+		}
+	}
+
+	[pool release];
+	return NO;
+}
+
+- (BOOL)hasDNSNameMatchingDomain: (OFString*)domain
+{
+	OFString *name;
+	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	OFDictionary *SANs = [self subjectAlternativeName];
+	OFList *assertedNames = [SANs objectForKey: @"dNSName"];
+
+	for (name in assertedNames) {
+		if ([self X509_isAssertedDomain: name
+				    equalDomain: domain]) {
+			[pool release];
+			return YES;
+		}
+	}
+
+	[pool release];
+	return NO;
+}
+
+- (BOOL)hasSRVNameMatchingDomain: (OFString*)domain
+			 service: (OFString*)service
+{
+	size_t serviceLength;
+	OFString *name;
+	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	OFDictionary *SANs = [self subjectAlternativeName];
+	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
+				     objectForKey: OID_SRVName];
+
+	if (![service hasPrefix: @"_"])
+		service = [service stringByPrependingString: @"_"];
+
+	service = [service stringByAppendingString: @"."];
+	serviceLength = [service length];
+
+	for (name in assertedNames) {
+		if ([name hasPrefix: service]) {
+			OFString *asserted;
+			asserted = [name substringWithRange:
+				of_range(serviceLength,
+					[name length] - serviceLength)];
+			if ([self X509_isAssertedDomain: asserted
+					    equalDomain: domain]) {
+				[pool release];
+				return YES;
+			}
+		}
+	}
+
+	[pool release];
+	return NO;
+}
+
+- (BOOL) X509_isAssertedDomain: (OFString*)asserted
+		   equalDomain: (OFString*)domain
+{
+	/*
+	 * In accordance with RFC 6125 this only allows a wildcard as the
+	 * left-most label and matches only the left-most label with it.
+	 * E.g. *.example.com matches foo.example.com,
+	 * but not foo.bar.example.com
+	 */
+	size_t firstDot;
+	if (![asserted caseInsensitiveCompare: domain])
+		return YES;
+
+	if (![asserted hasPrefix: @"*."])
+		return NO;
+
+	asserted = [asserted substringWithRange: of_range(2,
+			[asserted length] - 2)];
+
+	firstDot = [domain indexOfFirstOccurrenceOfString: @"."];
+	if (firstDot == OF_INVALID_INDEX)
+		return NO;
+	domain = [domain substringWithRange: of_range(firstDot + 1,
+			[domain length] - firstDot - 1)];
+
+	if (![asserted caseInsensitiveCompare: domain])
+		return YES;
+
+	return NO;
+}
+
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name
 {
 	int i;

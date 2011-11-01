@@ -55,7 +55,13 @@
 - (OFDictionary*)issuer;
 - (OFDictionary*)subject;
 - (OFDictionary*)subjectAlternativeName;
+- (BOOL)hasCommonNameMatchingDomain: (OFString*)domain;
+- (BOOL)hasDNSNameMatchingDomain: (OFString*)domain;
+- (BOOL)hasSRVNameMatchingDomain: (OFString*)domain
+			 service: (OFString*)service;
+- (BOOL)X509_isAssertedDomain: (OFString*)asserted
+		  equalDomain: (OFString*)domain;
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
 - (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
-- (OFString*) X509_stringFromASN1String: (ASN1_STRING*)str;
+- (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
 @end
