@@ -26,6 +26,7 @@
 #import "X509Certificate.h"
 
 #import <ObjFW/OFAutoreleasePool.h>
+#import <ObjFW/OFArray.h>
 #import <ObjFW/OFDataArray.h>
 #import <ObjFW/OFDictionary.h>
 #import <ObjFW/OFFile.h>
@@ -79,6 +80,10 @@
 
 - (void)dealloc
 {
+	[issuer release];
+	[subject release];
+	[subjectAlternativeName release];
+
 	if (crt != NULL)
 		X509_free(crt);
 
@@ -87,18 +92,29 @@
 
 - (OFDictionary*)issuer
 {
-	X509_NAME *name = X509_get_issuer_name(crt);
-	return [self X509_dictionaryFromX509Name: name];
+	if (issuer == nil) {
+		X509_NAME *name = X509_get_issuer_name(crt);
+		issuer = [[self X509_dictionaryFromX509Name: name] retain];
+	}
+
+	return issuer;
 }
 
 - (OFDictionary*)subject
 {
-	X509_NAME *name = X509_get_subject_name(crt);
-	return [self X509_dictionaryFromX509Name: name];
+	if (subject == nil) {
+		X509_NAME *name = X509_get_subject_name(crt);
+		subject = [[self X509_dictionaryFromX509Name: name] retain];
+	}
+
+	return subject;
 }
 
 - (OFDictionary*)subjectAlternativeName
 {
+	if (subjectAlternativeName != nil)
+		return subjectAlternativeName;
+
 	int i = -1, j;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	OFMutableDictionary *ret = [OFMutableDictionary dictionary];
@@ -222,7 +238,7 @@
 	[ret retain];
 	[pool release];
 
-	return [ret autorelease];
+	return (subjectAlternativeName = ret);
 }
 
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name

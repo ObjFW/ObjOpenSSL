@@ -41,10 +41,13 @@
 @interface X509Certificate: OFObject
 {
 	X509 *crt;
+	OFDictionary *issuer;
+	OFDictionary *subject;
+	OFDictionary *subjectAlternativeName;
 }
 
 #ifdef OF_HAVE_PROPERTIES
-// @property (opts) Type *name;
+@property (readonly) OFDictionary *issuer, *subject, *subjectAlternativeName;
 #endif
 
 - initWithFile: (OFString*)file;
