@@ -23,6 +23,7 @@
 #include <openssl/x509.h>
 
 #import <ObjFW/OFObject.h>
+#import <ObjFW/OFString.h>
 @class OFDictionary;
 
 /* OIDs: */
@@ -64,4 +65,7 @@
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
 - (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
 - (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
+@end
+
+@interface X509OID: OFString {}
 @end

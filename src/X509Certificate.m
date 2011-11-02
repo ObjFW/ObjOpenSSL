@@ -90,6 +90,18 @@
 	[super dealloc];
 }
 
+- (OFString*)description
+{
+	OFMutableString *ret = nil;//[OFMutableString string];
+
+	[ret appendFormat: @"Issuer: %@\n\n", [self issuer]];
+	[ret appendFormat: @"Subject: %@\n\n", [self subject]];
+	[ret appendFormat: @"SANs: %@", [self subjectAlternativeName]];
+
+	[ret makeImmutable];
+	return ret;
+}
+
 - (OFDictionary*)issuer
 {
 	if (issuer == nil) {
@@ -383,7 +395,7 @@
 		[self resizeMemory: buf
 			    toSize: buf_len];
 	}
-	ret = [OFString stringWithUTF8String: buf];
+	ret = [X509OID stringWithUTF8String: buf];
 	[self freeMemory: buf];
 	return ret;
 }
@@ -397,5 +409,14 @@
 	ret = [OFString stringWithUTF8String: buf];
 	OPENSSL_free(buf);
 	return ret;
+}
+@end
+
+@implementation X509OID
+- (OFString*)description
+{
+	char tmp[1024];
+	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj(s->cString, 1), 0);
+	return [OFString stringWithUTF8String: tmp];
 }
 @end
