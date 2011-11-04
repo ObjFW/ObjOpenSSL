@@ -92,7 +92,7 @@
 
 - (OFString*)description
 {
-	OFMutableString *ret = nil;//[OFMutableString string];
+	OFMutableString *ret = [OFMutableString string];
 
 	[ret appendFormat: @"Issuer: %@\n\n", [self issuer]];
 	[ret appendFormat: @"Subject: %@\n\n", [self subject]];
@@ -104,63 +104,71 @@
 
 - (OFDictionary*)issuer
 {
-	if (issuer == nil) {
-		X509_NAME *name = X509_get_issuer_name(crt);
-		issuer = [[self X509_dictionaryFromX509Name: name] retain];
-	}
+	X509_NAME *name;
+
+	if (issuer != nil)
+		return [[issuer copy] autorelease];
+
+	name = X509_get_issuer_name(crt);
+	issuer = [[self X509_dictionaryFromX509Name: name] retain];
 
 	return issuer;
 }
 
 - (OFDictionary*)subject
 {
-	if (subject == nil) {
-		X509_NAME *name = X509_get_subject_name(crt);
-		subject = [[self X509_dictionaryFromX509Name: name] retain];
-	}
+	X509_NAME *name;
+
+	if (subject != nil)
+		return [[subject copy] autorelease];
+
+	name = X509_get_subject_name(crt);
+	subject = [[self X509_dictionaryFromX509Name: name] retain];
 
 	return subject;
 }
 
 - (OFDictionary*)subjectAlternativeName
 {
+	OFAutoreleasePool *pool;
+	OFMutableDictionary *ret;
+	int i;
+
 	if (subjectAlternativeName != nil)
-		return subjectAlternativeName;
+		return [[subjectAlternativeName copy] autorelease];
 
-	int i = -1, j;
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-	OFMutableDictionary *ret = [OFMutableDictionary dictionary];
+	ret = [OFMutableDictionary dictionary];
+	pool = [[OFAutoreleasePool alloc] init];
 
+	i = -1;
 	while ((i = X509_get_ext_by_NID(crt, NID_subject_alt_name, i)) != -1) {
 		X509_EXTENSION *extension;
 		STACK_OF(GENERAL_NAME) *values;
-		int count;
+		int j, count;
 
-		extension = X509_get_ext(crt, i);
-		if (extension == NULL)
+		if ((extension = X509_get_ext(crt, i)) == NULL)
 			break;
 
-		values = X509V3_EXT_d2i(extension);
-		if (values == NULL)
+		if ((values = X509V3_EXT_d2i(extension)) == NULL)
 			break;
 
 		count = sk_GENERAL_NAME_num(values);
 		for (j = 0; j < count; j++) {
 			GENERAL_NAME *generalName;
+			OFList *list;
 
 			generalName = sk_GENERAL_NAME_value(values, j);
 
 			switch(generalName->type) {
-			case GEN_OTHERNAME: {
+			case GEN_OTHERNAME:;
 				OTHERNAME *otherName = generalName->d.otherName;
 				OFMutableDictionary *types;
-				OFList *list;
 				OFString *key;
 
 				types = [ret objectForKey: @"otherName"];
 				if (types == nil) {
-					types
-					    = [OFMutableDictionary dictionary];
+					types =
+					    [OFMutableDictionary dictionary];
 					[ret setObject: types
 						forKey: @"otherName"];
 				}
@@ -178,10 +186,7 @@
 				    [self X509_stringFromASN1String:
 					otherName->value->value.asn1_string]];
 				break;
-			}
-			case GEN_EMAIL: {
-				OFList *list;
-
+			case GEN_EMAIL:
 				list = [ret objectForKey: @"rfc822Name"];
 				if (list == nil) {
 					list = [OFList list];
@@ -193,10 +198,7 @@
 				    [self X509_stringFromASN1String:
 					generalName->d.rfc822Name]];
 				break;
-			}
-			case GEN_DNS: {
-				OFList *list;
-
+			case GEN_DNS:
 				list = [ret objectForKey: @"dNSName"];
 				if (list == nil) {
 					list = [OFList list];
@@ -207,50 +209,45 @@
 				    [self X509_stringFromASN1String:
 					generalName->d.dNSName]];
 				break;
-			}
-			case GEN_URI: {
-				OFList *list;
-
+			case GEN_URI:
 				list = [ret objectForKey:
-					   @"uniformResourceIdentifier"];
+				    @"uniformResourceIdentifier"];
 				if (list == nil) {
 					list = [OFList list];
 					[ret setObject: list
-						forKey:
-						  @"uniformResourceIdentifier"];
+						forKey: @"uniformResource"
+							@"Identifier"];
 				}
 				[list appendObject:
 				    [self X509_stringFromASN1String:
 				    generalName->d.uniformResourceIdentifier]];
 				break;
-			}
-			case GEN_IPADD: {
-				OFList *list;
-
+			case GEN_IPADD:
 				list = [ret objectForKey: @"iPAddress"];
 				if (list == nil) {
 					list = [OFList list];
 					[ret setObject: list
 						forKey: @"iPAddress"];
 				}
-				[list appendObject:
-				    [self X509_stringFromASN1String:
-					generalName->d.iPAddress]];
+				[list appendObject: [self
+				    X509_stringFromASN1String:
+				    generalName->d.iPAddress]];
 				break;
-			}
 			default:
 				break;
 			}
 		}
 
 		i++; /* Next extension */
+		[pool releaseObjects];
 	}
 
-	[ret makeImmutable];
-	[ret retain];
 	[pool release];
 
-	return (subjectAlternativeName = ret);
+	[ret makeImmutable];
+	subjectAlternativeName = [ret retain];
+
+	return ret;
 }
 
 - (BOOL)hasCommonNameMatchingDomain: (OFString*)domain
@@ -309,9 +306,8 @@
 	for (name in assertedNames) {
 		if ([name hasPrefix: service]) {
 			OFString *asserted;
-			asserted = [name substringWithRange:
-				of_range(serviceLength,
-					[name length] - serviceLength)];
+			asserted = [name substringWithRange: of_range(
+			    serviceLength, [name length] - serviceLength)];
 			if ([self X509_isAssertedDomain: asserted
 					    equalDomain: domain]) {
 				[pool release];
@@ -324,8 +320,8 @@
 	return NO;
 }
 
-- (BOOL) X509_isAssertedDomain: (OFString*)asserted
-		   equalDomain: (OFString*)domain
+- (BOOL)X509_isAssertedDomain: (OFString*)asserted
+		  equalDomain: (OFString*)domain
 {
 	/*
 	 * In accordance with RFC 6125 this only allows a wildcard as the
@@ -333,21 +329,24 @@
 	 * E.g. *.example.com matches foo.example.com,
 	 * but not foo.bar.example.com
 	 */
+
 	size_t firstDot;
-	if (![asserted caseInsensitiveCompare: domain])
+
+	if ([asserted caseInsensitiveCompare: domain] == OF_ORDERED_SAME)
 		return YES;
 
 	if (![asserted hasPrefix: @"*."])
 		return NO;
 
-	asserted = [asserted substringWithRange: of_range(2,
-			[asserted length] - 2)];
+	asserted = [asserted substringWithRange:
+	    of_range(2, [asserted length] - 2)];
 
 	firstDot = [domain indexOfFirstOccurrenceOfString: @"."];
 	if (firstDot == OF_INVALID_INDEX)
 		return NO;
-	domain = [domain substringWithRange: of_range(firstDot + 1,
-			[domain length] - firstDot - 1)];
+
+	domain = [domain substringWithRange:
+	    of_range(firstDot + 1, [domain length] - firstDot - 1)];
 
 	if (![asserted caseInsensitiveCompare: domain])
 		return YES;
@@ -357,10 +356,9 @@
 
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name
 {
-	int i;
-	int count = X509_NAME_entry_count(name);
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	OFMutableDictionary *dict = [OFMutableDictionary dictionary];
+	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	int i, count = X509_NAME_entry_count(name);
 
 	for (i = 0; i < count; i++) {
 		OFString *key, *value;
@@ -375,39 +373,53 @@
 
 		value = [self X509_stringFromASN1String: str];
 		[[dict objectForKey: key] appendObject: value];
+
+		[pool releaseObjects];
 	}
 
-	[dict makeImmutable];
-	[dict retain];
 	[pool release];
 
-	return [dict autorelease];
+	[dict makeImmutable];
+	return dict;
 }
 
 
-- (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj
+- (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)object
 {
-	int len, buf_len = 256;
-	char *buf = [self allocMemoryWithSize: buf_len];
 	OFString *ret;
-	while ((len = OBJ_obj2txt(buf, buf_len, obj, 1)) > buf_len) {
-		buf_len = len;
-		[self resizeMemory: buf
-			    toSize: buf_len];
+	int length, bufferLength = 256;
+	char *buffer = [self allocMemoryWithSize: bufferLength];
+
+	@try {
+		while ((length = OBJ_obj2txt(buffer, bufferLength, object,
+		    1)) > bufferLength) {
+			bufferLength = length;
+			buffer = [self resizeMemory: buffer
+					     toSize: bufferLength];
+		}
+
+		ret = [X509OID stringWithUTF8String: buffer];
+	} @finally {
+		[self freeMemory: buffer];
 	}
-	ret = [X509OID stringWithUTF8String: buf];
-	[self freeMemory: buf];
+
 	return ret;
 }
 
-- (OFString*) X509_stringFromASN1String: (ASN1_STRING*)str
+- (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str
 {
-	char *buf;
 	OFString *ret;
-	if (ASN1_STRING_to_UTF8((unsigned char**)&buf, str) < 0)
+	char *buffer;
+
+	if (ASN1_STRING_to_UTF8((unsigned char**)&buffer, str) < 0)
 		@throw [OFInvalidEncodingException exceptionWithClass: isa];
-	ret = [OFString stringWithUTF8String: buf];
-	OPENSSL_free(buf);
+
+	@try {
+		ret = [OFString stringWithUTF8String: buffer];
+	} @finally {
+		OPENSSL_free(buffer);
+	}
+
 	return ret;
 }
 @end
