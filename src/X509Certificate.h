@@ -67,5 +67,8 @@
 - (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
 @end
 
-@interface X509OID: OFString {}
+@interface X509OID: OFObject <OFCopying>
+{
+	OFString *string;
+}
 @end

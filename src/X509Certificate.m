@@ -398,7 +398,8 @@
 					     toSize: bufferLength];
 		}
 
-		ret = [X509OID stringWithUTF8String: buffer];
+		ret = [[[X509OID alloc]
+		    initWithUTF8String: buffer] autorelease];
 	} @finally {
 		[self freeMemory: buffer];
 	}
@@ -425,10 +426,49 @@
 @end
 
 @implementation X509OID
+- initWithUTF8String: (const char*) str
+{
+	self = [self init];
+
+	@try {
+		string = [[OFString alloc] initWithUTF8String: str];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
+
+	return self;
+}
+
+- (void)dealloc
+{
+	[string release];
+	[super dealloc];
+}
+
 - (OFString*)description
 {
 	char tmp[1024];
-	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj(s->cString, 1), 0);
+	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj([string UTF8String], 1), 0);
 	return [OFString stringWithUTF8String: tmp];
+}
+
+- (BOOL)isEqual: (id)object
+{
+	if (([object isKindOfClass: [OFString class]]) ||
+	    ([object isKindOfClass: [X509OID class]]))
+		return [object isEqual: string];
+
+	return NO;
+}
+
+- (uint32_t)hash
+{
+	return [string hash];
+}
+
+- copy
+{
+	return [self retain];
 }
 @end
