@@ -39,6 +39,13 @@
 
 #define OID_SRVName @"1.3.6.1.5.5.7.8.7"
 
+@interface X509OID: OFObject <OFCopying>
+{
+	OFString *string;
+}
+- initWithUTF8String: (const char*) str;
+@end
+
 @interface X509Certificate: OFObject
 {
 	X509 *crt;
@@ -63,12 +70,7 @@
 - (BOOL)X509_isAssertedDomain: (OFString*)asserted
 		  equalDomain: (OFString*)domain;
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
-- (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
+- (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
 - (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
 @end
 
-@interface X509OID: OFObject <OFCopying>
-{
-	OFString *string;
-}
-@end

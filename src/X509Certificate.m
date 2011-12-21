@@ -163,7 +163,7 @@
 			case GEN_OTHERNAME:;
 				OTHERNAME *otherName = generalName->d.otherName;
 				OFMutableDictionary *types;
-				OFString *key;
+				X509OID *key;
 
 				types = [ret objectForKey: @"otherName"];
 				if (types == nil) {
@@ -361,7 +361,8 @@
 	int i, count = X509_NAME_entry_count(name);
 
 	for (i = 0; i < count; i++) {
-		OFString *key, *value;
+		X509OID *key;
+		OFString *value;
 		X509_NAME_ENTRY *entry = X509_NAME_get_entry(name, i);
 		ASN1_OBJECT *obj = X509_NAME_ENTRY_get_object(entry);
 		ASN1_STRING *str = X509_NAME_ENTRY_get_data(entry);
@@ -384,9 +385,9 @@
 }
 
 
-- (OFString*)X509_stringFromASN1Object: (ASN1_OBJECT*)object
+- (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)object
 {
-	OFString *ret;
+	X509OID *ret;
 	int length, bufferLength = 256;
 	char *buffer = [self allocMemoryWithSize: bufferLength];
 
