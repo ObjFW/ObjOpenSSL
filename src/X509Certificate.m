@@ -255,8 +255,9 @@
 	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	OFList *CNs = [[self subject] objectForKey: OID_commonName];
+	OFEnumerator *enumerator = [CNs objectEnumerator];
 
-	for (name in CNs) {
+	while ((name = [enumerator nextObject]) != nil) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
@@ -274,8 +275,9 @@
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	OFDictionary *SANs = [self subjectAlternativeName];
 	OFList *assertedNames = [SANs objectForKey: @"dNSName"];
+	OFEnumerator *enumerator = [assertedNames objectEnumerator];
 
-	for (name in assertedNames) {
+	while ((name = [enumerator nextObject]) != nil) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
@@ -296,6 +298,7 @@
 	OFDictionary *SANs = [self subjectAlternativeName];
 	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
 				     objectForKey: OID_SRVName];
+	OFEnumerator *enumerator = [assertedNames objectEnumerator];
 
 	if (![service hasPrefix: @"_"])
 		service = [service stringByPrependingString: @"_"];
@@ -303,7 +306,7 @@
 	service = [service stringByAppendingString: @"."];
 	serviceLength = [service length];
 
-	for (name in assertedNames) {
+	while ((name = [enumerator nextObject]) != nil) {
 		if ([name hasPrefix: service]) {
 			OFString *asserted;
 			asserted = [name substringWithRange: of_range(
