@@ -111,15 +111,17 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 		    certificateFile: nil];
 }
 
-- initWithSocket: (OFTCPSocket*)socket
-  privateKeyFile: (OFString*)privateKeyFile_
- certificateFile: (OFString*)certificateFile_
+-  initWithSocket: (OFTCPSocket*)socket
+   privateKeyFile: (OFString*)privateKeyFile_
+  certificateFile: (OFString*)certificateFile_
 {
 	self = [self init];
 
 	@try {
-		privateKeyFile = privateKeyFile_;
-		certificateFile = certificateFile_;
+		/* FIXME: Also allow with accepted sockets */
+
+		privateKeyFile = [privateKeyFile_ copy];
+		certificateFile = [certificateFile_ copy];
 
 		sock = dup(socket->sock);
 
@@ -366,18 +368,20 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 - (X509Certificate*)peerCertificate
 {
 	X509 *certificate = SSL_get_peer_certificate(ssl);
+
 	if (!certificate)
 		return nil;
 
 	return [[[X509Certificate alloc]
-		initWithX509Struct: certificate] autorelease];
+	    initWithX509Struct: certificate] autorelease];
 }
 
 - (void)verifyPeerCertificate
 {
 	unsigned long ret;
-	if ((SSL_get_peer_certificate(ssl) == NULL)
-	    || ((ret = SSL_get_verify_result(ssl)) != X509_V_OK)) {
+
+	if ((SSL_get_peer_certificate(ssl) == NULL) ||
+	    ((ret = SSL_get_verify_result(ssl)) != X509_V_OK)) {
 		const char *reason = X509_verify_cert_error_string(ret);
 		@throw [SSLInvalidCertificateException
 			exceptionWithClass: isa
