@@ -106,9 +106,21 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 
 - initWithSocket: (OFTCPSocket*)socket
 {
+	return [self initWithSocket: socket
+		     privateKeyFile: nil
+		    certificateFile: nil];
+}
+
+- initWithSocket: (OFTCPSocket*)socket
+  privateKeyFile: (OFString*)privateKeyFile_
+ certificateFile: (OFString*)certificateFile_
+{
 	self = [self init];
 
 	@try {
+		privateKeyFile = privateKeyFile_;
+		certificateFile = certificateFile_;
+
 		sock = dup(socket->sock);
 
 		if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
