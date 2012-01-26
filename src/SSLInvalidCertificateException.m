@@ -21,6 +21,7 @@
  */
 
 #import "SSLInvalidCertificateException.h"
+
 #import <ObjFW/OFNotImplementedException.h>
 
 @implementation SSLInvalidCertificateException
@@ -67,7 +68,7 @@
 		return description;
 
 	description = [[OFString alloc] initWithFormat:
-		@"Invalid certificate, Reason: %@!", reason];
+	    @"Invalid certificate, Reason: %@!", reason];
 
 	return description;
 }

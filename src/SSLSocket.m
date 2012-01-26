@@ -339,7 +339,7 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type
 {
-	int length;
+	size_t length;
 	char buffer[64];
 	OFDataArray *data;
 

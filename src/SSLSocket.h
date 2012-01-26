@@ -39,9 +39,9 @@
 #endif
 
 - initWithSocket: (OFTCPSocket*)socket;
-- initWithSocket: (OFTCPSocket*)socket
-  privateKeyFile: (OFString*)privateKeyFile
- certificateFile: (OFString*)certificateFile;
+-  initWithSocket: (OFTCPSocket*)socket
+   privateKeyFile: (OFString*)privateKeyFile
+  certificateFile: (OFString*)certificateFile;
 /* Change the return type */
 - (SSLSocket*)accept;
 - (void)setPrivateKeyFile: (OFString*)file;

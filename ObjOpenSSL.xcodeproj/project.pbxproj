@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */; };
+		4B19F58C14D17250005D52DC /* SSLInvalidCertificateException.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B19F58814D17250005D52DC /* SSLInvalidCertificateException.m */; };
+		4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58914D17250005D52DC /* X509Certificate.h */; };
+		4B19F58E14D17250005D52DC /* X509Certificate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B19F58A14D17250005D52DC /* X509Certificate.m */; };
 		4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD0AAEA1341289500445289 /* SSLSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAED1341289500445289 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BD0AAEB1341289500445289 /* SSLSocket.m */; };
@@ -15,6 +19,10 @@
 
 /* Begin PBXFileReference section */
 		4B1918EA1341272300D82152 /* ObjOpenSSL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjOpenSSL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLInvalidCertificateException.h; path = src/SSLInvalidCertificateException.h; sourceTree = SOURCE_ROOT; };
+		4B19F58814D17250005D52DC /* SSLInvalidCertificateException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SSLInvalidCertificateException.m; path = src/SSLInvalidCertificateException.m; sourceTree = SOURCE_ROOT; };
+		4B19F58914D17250005D52DC /* X509Certificate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = X509Certificate.h; path = src/X509Certificate.h; sourceTree = SOURCE_ROOT; };
+		4B19F58A14D17250005D52DC /* X509Certificate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = X509Certificate.m; path = src/X509Certificate.m; sourceTree = SOURCE_ROOT; };
 		4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjOpenSSL.h; path = src/ObjOpenSSL.h; sourceTree = SOURCE_ROOT; };
 		4BD0AAE91341286B00445289 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		4BD0AAEA1341289500445289 /* SSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLSocket.h; path = src/SSLSocket.h; sourceTree = SOURCE_ROOT; };
@@ -64,8 +72,12 @@
 			children = (
 				4B1918F41341272300D82152 /* Supporting Files */,
 				4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */,
+				4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */,
+				4B19F58814D17250005D52DC /* SSLInvalidCertificateException.m */,
 				4BD0AAEA1341289500445289 /* SSLSocket.h */,
 				4BD0AAEB1341289500445289 /* SSLSocket.m */,
+				4B19F58914D17250005D52DC /* X509Certificate.h */,
+				4B19F58A14D17250005D52DC /* X509Certificate.m */,
 			);
 			path = ObjOpenSSL;
 			sourceTree = "<group>";
@@ -87,6 +99,8 @@
 			files = (
 				4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */,
 				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
+				4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */,
+				4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +163,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BD0AAED1341289500445289 /* SSLSocket.m in Sources */,
+				4B19F58C14D17250005D52DC /* SSLInvalidCertificateException.m in Sources */,
+				4B19F58E14D17250005D52DC /* X509Certificate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,7 +179,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -178,7 +193,6 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -197,7 +211,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				OTHER_CFLAGS = (
 					"-I/opt/local/include",
@@ -212,7 +226,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
 					"-Wall",
-					"-Werror",
 					"-Wshorten-64-to-32",
 					"-Wwrite-strings",
 					"-Wcast-align",
@@ -232,7 +245,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				OTHER_CFLAGS = (
 					"-I/opt/local/include",
@@ -247,7 +260,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
 					"-Wall",
-					"-Werror",
 					"-Wshorten-64-to-32",
 					"-Wwrite-strings",
 					"-Wcast-align",
