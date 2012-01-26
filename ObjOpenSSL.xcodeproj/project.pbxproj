@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */; };
+		4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B19F58C14D17250005D52DC /* SSLInvalidCertificateException.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B19F58814D17250005D52DC /* SSLInvalidCertificateException.m */; };
-		4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58914D17250005D52DC /* X509Certificate.h */; };
+		4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19F58914D17250005D52DC /* X509Certificate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B19F58E14D17250005D52DC /* X509Certificate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B19F58A14D17250005D52DC /* X509Certificate.m */; };
 		4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD0AAEA1341289500445289 /* SSLSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -98,8 +98,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */,
-				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
 				4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */,
+				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
 				4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -130,6 +130,9 @@
 /* Begin PBXProject section */
 		4B1918E01341272300D82152 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 4B1918E31341272300D82152 /* Build configuration list for PBXProject "ObjOpenSSL" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -162,8 +165,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BD0AAED1341289500445289 /* SSLSocket.m in Sources */,
 				4B19F58C14D17250005D52DC /* SSLInvalidCertificateException.m in Sources */,
+				4BD0AAED1341289500445289 /* SSLSocket.m in Sources */,
 				4B19F58E14D17250005D52DC /* X509Certificate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -184,7 +187,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -197,7 +199,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -211,7 +212,6 @@
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				OTHER_CFLAGS = (
 					"-I/opt/local/include",
@@ -245,7 +245,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = Info.plist;
 				OTHER_CFLAGS = (
 					"-I/opt/local/include",
