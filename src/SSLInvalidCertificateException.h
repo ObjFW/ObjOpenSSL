@@ -29,7 +29,7 @@
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property (readonly, nonatomic) OFString *reason;
+@property (readonly, assign) OFString *reason;
 #endif
 
 + exceptionWithClass: (Class)class
