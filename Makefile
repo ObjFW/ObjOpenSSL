@@ -8,15 +8,17 @@ LIBS += -lssl -lcrypto -lz
 includedir = ObjOpenSSL
 prefix ?= /usr/local
 INSTALL ?= install
+OBJFW_CONFIG ?= objfw-config
+OBJFW_COMPILE ?= objfw-compile
 
-LIB_PREFIX = `objfw-config --lib-prefix`
-LIB_SUFFIX = `objfw-config --lib-suffix`
+LIB_PREFIX = `${OBJFW_CONFIG} --lib-prefix`
+LIB_SUFFIX = `${OBJFW_CONFIG} --lib-suffix`
 LIB_FILE = ${LIB_PREFIX}${LIB}${LIB_SUFFIX}
 
 .SILENT:
 
 all:
-	objfw-compile --lib ${LIB_MAJOR}.${LIB_MINOR} ${CPPFLAGS} ${LIBS} \
+	${OBJFW_COMPILE} --lib ${LIB_MAJOR}.${LIB_MINOR} ${CPPFLAGS} ${LIBS} \
 		-o ${LIB} -Wno-deprecated-declarations src/*.m
 
 install: install-lib install-headers
