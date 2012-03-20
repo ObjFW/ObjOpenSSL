@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
+ * Copyright (c) 2011, Jonathan Schleifer <js@webkeks.org>
  *
  * https://webkeks.org/git/?p=objopenssl.git
  *
