@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  *
- * https://webkeks.org/hg/objopenssl/
+ * https://webkeks.org/git/?p=objopenssl.git
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,6 +24,7 @@
 
 #import <ObjFW/OFObject.h>
 #import <ObjFW/OFString.h>
+
 @class OFDictionary;
 
 /* OIDs: */
@@ -43,7 +44,8 @@
 {
 	OFString *string;
 }
-- initWithUTF8String: (const char*) str;
+
+- initWithUTF8String: (const char*)str;
 @end
 
 @interface X509Certificate: OFObject
@@ -73,4 +75,3 @@
 - (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
 - (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
 @end
-
