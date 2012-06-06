@@ -400,7 +400,7 @@
 		    1)) > bufferLength) {
 			bufferLength = length;
 			buffer = [self resizeMemory: buffer
-					     toSize: bufferLength];
+					       size: bufferLength];
 		}
 
 		ret = [[[X509OID alloc]
