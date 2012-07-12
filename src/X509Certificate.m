@@ -53,7 +53,7 @@
 		[pool release];
 		if (crt == NULL)
 			@throw [OFInitializationFailedException
-				    exceptionWithClass: isa];
+				    exceptionWithClass: [self class]];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -70,7 +70,7 @@
 		crt = X509_dup(cert);
 		if (crt == NULL)
 			@throw [OFInitializationFailedException
-				    exceptionWithClass: isa];
+				    exceptionWithClass: [self class]];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -418,7 +418,8 @@
 	char *buffer;
 
 	if (ASN1_STRING_to_UTF8((unsigned char**)&buffer, str) < 0)
-		@throw [OFInvalidEncodingException exceptionWithClass: isa];
+		@throw [OFInvalidEncodingException
+		    exceptionWithClass: [self class]];
 
 	@try {
 		ret = [OFString stringWithUTF8String: buffer];
