@@ -270,10 +270,14 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 		@throw e;
 	}
 
-	if ((ret = SSL_read(ssl, buffer, (int)length)) < 0)
+	if ((ret = SSL_read(ssl, buffer, (int)length)) < 0) {
+		if (SSL_get_error(ssl, ret) ==  SSL_ERROR_WANT_READ)
+			return 0;
+
 		@throw [OFReadFailedException exceptionWithClass: [self class]
 							  stream: self
 						 requestedLength: length];
+	}
 
 	if (ret == 0)
 		atEndOfStream = YES;
