@@ -389,13 +389,17 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 {
 	unsigned long ret;
 
-	if ((SSL_get_peer_certificate(ssl) == NULL) ||
-	    ((ret = SSL_get_verify_result(ssl)) != X509_V_OK)) {
-		const char *reason = X509_verify_cert_error_string(ret);
+	if (SSL_get_peer_certificate(ssl) != NULL) {
+		if ((ret = SSL_get_verify_result(ssl)) != X509_V_OK) {
+			const char *tmp = X509_verify_cert_error_string(ret);
+			OFString *reason = [OFString stringWithUTF8String: tmp];
+			@throw [SSLInvalidCertificateException
+				exceptionWithClass: [self class]
+					    reason: reason];
+		}
+	} else
 		@throw [SSLInvalidCertificateException
 			exceptionWithClass: [self class]
-				    reason: [OFString
-						stringWithUTF8String: reason]];
-	}
+				    reason: @"No certificate"];
 }
 @end
