@@ -300,7 +300,7 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 
 		e = [OFWriteFailedException exceptionWithClass: [self class]
 							stream: self
-					 requestedLength: length];
+					       requestedLength: length];
 
 #ifndef _WIN32
 		e->errNo = ENOTCONN;
@@ -394,12 +394,12 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 			const char *tmp = X509_verify_cert_error_string(ret);
 			OFString *reason = [OFString stringWithUTF8String: tmp];
 			@throw [SSLInvalidCertificateException
-				exceptionWithClass: [self class]
-					    reason: reason];
+			    exceptionWithClass: [self class]
+					reason: reason];
 		}
 	} else
 		@throw [SSLInvalidCertificateException
-			exceptionWithClass: [self class]
-				    reason: @"No certificate"];
+		    exceptionWithClass: [self class]
+				reason: @"No certificate"];
 }
 @end
