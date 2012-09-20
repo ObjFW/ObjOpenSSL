@@ -243,8 +243,8 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 	[super close];
 }
 
-- (size_t)_readIntoBuffer: (void*)buffer
-		   length: (size_t)length
+- (size_t)lowlevelReadIntoBuffer: (void*)buffer
+			  length: (size_t)length
 {
 	ssize_t ret;
 
@@ -285,8 +285,8 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 	return ret;
 }
 
-- (void)_writeBuffer: (const void*)buffer
-	      length: (size_t)length
+- (void)lowlevelWriteBuffer: (const void*)buffer
+		     length: (size_t)length
 {
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exceptionWithClass: [self class]];
