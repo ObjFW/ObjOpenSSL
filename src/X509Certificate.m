@@ -37,6 +37,8 @@
 #import <ObjFW/OFMutableDictionary.h>
 #import <ObjFW/OFString.h>
 
+#import <ObjFW/macros.h>
+
 @implementation X509Certificate
 - initWithFile: (OFString*)file
 {
@@ -345,8 +347,8 @@
 	asserted = [asserted substringWithRange:
 	    of_range(2, [asserted length] - 2)];
 
-	firstDot = [domain indexOfFirstOccurrenceOfString: @"."];
-	if (firstDot == OF_INVALID_INDEX)
+	firstDot = [domain rangeOfString: @"."].location;
+	if (firstDot == OF_NOT_FOUND)
 		return NO;
 
 	domain = [domain substringWithRange:
