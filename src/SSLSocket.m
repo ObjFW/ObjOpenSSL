@@ -26,15 +26,12 @@
 #include <errno.h>
 #include <assert.h>
 
-#import <ObjFW/OFHTTPRequest.h>
-#import <ObjFW/OFDataArray.h>
-
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 
-#import "SSLSocket.h"
-#import "SSLInvalidCertificateException.h"
-#import "X509Certificate.h"
+#import <ObjFW/OFThread.h>
+#import <ObjFW/OFHTTPRequest.h>
+#import <ObjFW/OFDataArray.h>
 
 #import <ObjFW/OFAcceptFailedException.h>
 #import <ObjFW/OFConnectionFailedException.h>
@@ -47,6 +44,10 @@
 #import <ObjFW/macros.h>
 #import <ObjFW/threading.h>
 
+#import "SSLSocket.h"
+#import "SSLInvalidCertificateException.h"
+#import "X509Certificate.h"
+
 #ifndef INVALID_SOCKET
 # define INVALID_SOCKET -1
 #endif
@@ -54,8 +55,14 @@
 static SSL_CTX *ctx;
 static of_mutex_t *ssl_mutexes;
 
+static unsigned long
+get_thread_id(void)
+{
+	return (unsigned long)(uintptr_t)[OFThread currentThread];
+}
+
 static void
-ssl_locking_callback(int mode, int n, const char *file, int line)
+locking_callback(int mode, int n, const char *file, int line)
 {
 	/*
 	 * This function must handle up to CRYPTO_num_locks() mutexes.
@@ -81,7 +88,7 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 	if (self != [SSLSocket class])
 		return;
 
-	CRYPTO_set_id_callback(&of_thread_current);
+	CRYPTO_set_id_callback(&get_thread_id);
 
 	/* Generate number of mutexes needed */
 	m = CRYPTO_num_locks();
@@ -89,7 +96,7 @@ ssl_locking_callback(int mode, int n, const char *file, int line)
 	for (m--; m >= 0; m--)
 		of_mutex_new(&ssl_mutexes[m]);
 
-	CRYPTO_set_locking_callback(&ssl_locking_callback);
+	CRYPTO_set_locking_callback(&locking_callback);
 
 	SSL_library_init();
 
