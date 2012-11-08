@@ -1,8 +1,16 @@
-*.dylib
 *.o
 *.so
+*.dylib
 *~
+.deps
+aclocal.m4
+autom4te.cache
+buildsys.mk
+config.log
+config.status
+configure
 DerivedData
+extra.mk
 ObjOpenSSL.xcodeproj/*.mode1v3
 ObjOpenSSL.xcodeproj/*.pbxuser
 ObjOpenSSL.xcodeproj/project.xcworkspace
