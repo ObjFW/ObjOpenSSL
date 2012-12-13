@@ -78,7 +78,7 @@ locking_callback(int mode, int n, const char *file, int line)
 @implementation SSLSocket
 + (void)load
 {
-	of_http_request_tls_socket_class = self;
+	of_tls_socket_class = self;
 }
 
 + (void)initialize
