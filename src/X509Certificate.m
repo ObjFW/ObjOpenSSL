@@ -50,7 +50,7 @@
 					     mode: @"r"];
 		OFDataArray *data = [fd readDataArrayTillEndOfStream];
 		[fd close];
-		const unsigned char *dataCArray = [data cArray];
+		const unsigned char *dataCArray = [data items];
 		crt = d2i_X509(NULL, &dataCArray, [data count]);
 		[pool release];
 		if (crt == NULL)
