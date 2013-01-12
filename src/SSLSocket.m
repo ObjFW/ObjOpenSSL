@@ -144,10 +144,10 @@ locking_callback(int mode, int n, const char *file, int line)
 		SSL_set_connect_state(ssl);
 
 		if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-		    [privateKeyFile cStringUsingEncoding:
+		    [privateKeyFile cStringWithEncoding:
 		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
 		    (certificateFile != nil && !SSL_use_certificate_file(ssl,
-		    [certificateFile cStringUsingEncoding:
+		    [certificateFile cStringWithEncoding:
 		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
 		    SSL_connect(ssl) != 1) {
 			close(sock);
@@ -194,10 +194,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	SSL_set_connect_state(ssl);
 
 	if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-	    [privateKeyFile cStringUsingEncoding: OF_STRING_ENCODING_NATIVE],
+	    [privateKeyFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM)) || (certificateFile != nil &&
 	    !SSL_use_certificate_file(ssl, [certificateFile
-	    cStringUsingEncoding: OF_STRING_ENCODING_NATIVE],
+	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM)) || SSL_connect(ssl) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException
@@ -226,9 +226,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	SSL_set_accept_state(newSocket->ssl);
 
 	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile
-	    cStringUsingEncoding: OF_STRING_ENCODING_NATIVE],
+	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newSocket->ssl,
-	    [certificateFile cStringUsingEncoding: OF_STRING_ENCODING_NATIVE],
+	    [certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM) || SSL_accept(newSocket->ssl) != 1) {
 		/* We only want to close the OFTCPSocket */
 		object_setClass(newSocket, [OFTCPSocket class]);
