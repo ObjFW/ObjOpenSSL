@@ -223,6 +223,9 @@ locking_callback(int mode, int n, const char *file, int line)
 							    socket: self];
 	}
 
+	if (requestsClientCertificates)
+		SSL_set_verify(newSocket->ssl, SSL_VERIFY_PEER, NULL);
+
 	SSL_set_accept_state(newSocket->ssl);
 
 	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile
@@ -350,6 +353,16 @@ locking_callback(int mode, int n, const char *file, int line)
 - (OFString*)certificateFile
 {
 	OF_GETTER(certificateFile, YES)
+}
+
+- (void)setRequestsClientCertificates: (BOOL)enabled
+{
+	requestsClientCertificates = enabled;
+}
+
+- (BOOL)requestsClientCertificates
+{
+	return requestsClientCertificates;
 }
 
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type

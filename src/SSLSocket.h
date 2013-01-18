@@ -32,11 +32,13 @@
 	SSL *ssl;
 	OFString *privateKeyFile;
 	OFString *certificateFile;
+	BOOL requestsClientCertificates;
 }
 
 #ifdef OF_HAVE_PROPERTIES
 @property (copy) OFString *privateKeyFile;
 @property (copy) OFString *certificateFile;
+@property BOOL requestsClientCertificates;
 #endif
 
 - initWithSocket: (OFTCPSocket*)socket;
@@ -49,6 +51,8 @@
 - (OFString*)privateKeyFile;
 - (void)setCertificateFile: (OFString*)file;
 - (OFString*)certificateFile;
+- (void)setRequestsClientCertificates: (BOOL)enabled;
+- (BOOL)requestsClientCertificates;
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type;
 - (X509Certificate*)peerCertificate;
 - (void)verifyPeerCertificate;
