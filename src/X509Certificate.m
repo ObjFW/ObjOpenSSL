@@ -464,9 +464,14 @@
 
 - (BOOL)isEqual: (id)object
 {
-	if (([object isKindOfClass: [OFString class]]) ||
-	    ([object isKindOfClass: [X509OID class]]))
-		return [object isEqual: _string];
+	if ([object isKindOfClass: [X509OID class]]) {
+		X509OID *OID = object;
+
+		return [OID->_string isEqual: _string];
+	}
+
+	if ([object isKindOfClass: [OFString class]])
+		return [_string isEqual: object];
 
 	return NO;
 }
