@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
+ * Copyright (c) 2013, Jonathan Schleifer <js@webkeks.org>
  *
  * https://webkeks.org/git/?p=objopenssl.git
  *
@@ -22,17 +23,19 @@
 
 #import "SSLInvalidCertificateException.h"
 
+#import <ObjFW/macros.h>
+
 #import <ObjFW/OFNotImplementedException.h>
 
 @implementation SSLInvalidCertificateException
-+ exceptionWithClass: (Class)class_
-	      reason: (OFString*)reason_
++ exceptionWithClass: (Class)class
+	      reason: (OFString*)reason
 {
-	return [[[self alloc] initWithClass: class_
-				     reason: reason_] autorelease];
+	return [[[self alloc] initWithClass: class
+				     reason: reason] autorelease];
 }
 
-- initWithClass: (Class)class_
+- initWithClass: (Class)class
 {
 	Class c = [self class];
 	[self release];
@@ -40,13 +43,13 @@
 						    selector: _cmd];
 }
 
-- initWithClass: (Class)class_
-	 reason: (OFString*)reason_
+- initWithClass: (Class)class
+	 reason: (OFString*)reason
 {
-	self = [super initWithClass: class_];
+	self = [super initWithClass: class];
 
 	@try {
-		reason = [reason_ copy];
+		_reason = [reason copy];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -57,24 +60,24 @@
 
 - (void)dealloc
 {
-	[reason release];
+	[_reason release];
 
 	[super dealloc];
 }
 
 - (OFString*)description
 {
-	if (description != nil)
-		return description;
+	if (_description != nil)
+		return _description;
 
-	description = [[OFString alloc] initWithFormat:
-	    @"Invalid certificate! Reason: %@", reason];
+	_description = [[OFString alloc] initWithFormat:
+	    @"Invalid certificate! Reason: %@", _reason];
 
-	return description;
+	return _description;
 }
 
 - (OFString*)reason
 {
-	return reason;
+	OF_GETTER(_reason, NO)
 }
 @end

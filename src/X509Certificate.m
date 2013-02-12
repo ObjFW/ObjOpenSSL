@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
- * Copyright (c) 2011, Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, 2013, Jonathan Schleifer <js@webkeks.org>
  *
  * https://webkeks.org/git/?p=objopenssl.git
  *
@@ -40,22 +40,22 @@
 #import <ObjFW/macros.h>
 
 @implementation X509Certificate
-- initWithFile: (OFString*)file
+- initWithFile: (OFString*)path
 {
 	self = [self init];
 
 	@try {
 		OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-		OFFile *fd = [OFFile fileWithPath: file
-					     mode: @"r"];
-		OFDataArray *data = [fd readDataArrayTillEndOfStream];
-		[fd close];
+		OFDataArray *data = [OFDataArray
+		    dataArrayWithContentsOfFile: path];
 		const unsigned char *dataCArray = [data items];
-		crt = d2i_X509(NULL, &dataCArray, [data count]);
-		[pool release];
-		if (crt == NULL)
+
+		_certificate = d2i_X509(NULL, &dataCArray, [data count]);
+		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
 				    exceptionWithClass: [self class]];
+
+		[pool release];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -64,13 +64,13 @@
 	return self;
 }
 
-- initWithX509Struct: (X509*)cert
+- initWithX509Struct: (X509*)certificate
 {
 	self = [self init];
 
 	@try {
-		crt = X509_dup(cert);
-		if (crt == NULL)
+		_certificate = X509_dup(certificate);
+		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
 				    exceptionWithClass: [self class]];
 	} @catch (id e) {
@@ -83,12 +83,12 @@
 
 - (void)dealloc
 {
-	[issuer release];
-	[subject release];
-	[subjectAlternativeName release];
+	[_issuer release];
+	[_subject release];
+	[_subjectAlternativeName release];
 
-	if (crt != NULL)
-		X509_free(crt);
+	if (_certificate != NULL)
+		X509_free(_certificate);
 
 	[super dealloc];
 }
@@ -109,26 +109,26 @@
 {
 	X509_NAME *name;
 
-	if (issuer != nil)
-		return [[issuer copy] autorelease];
+	if (_issuer != nil)
+		return [[_issuer copy] autorelease];
 
-	name = X509_get_issuer_name(crt);
-	issuer = [[self X509_dictionaryFromX509Name: name] retain];
+	name = X509_get_issuer_name(_certificate);
+	_issuer = [[self X509_dictionaryFromX509Name: name] retain];
 
-	return issuer;
+	return _issuer;
 }
 
 - (OFDictionary*)subject
 {
 	X509_NAME *name;
 
-	if (subject != nil)
-		return [[subject copy] autorelease];
+	if (_subject != nil)
+		return [[_subject copy] autorelease];
 
-	name = X509_get_subject_name(crt);
-	subject = [[self X509_dictionaryFromX509Name: name] retain];
+	name = X509_get_subject_name(_certificate);
+	_subject = [[self X509_dictionaryFromX509Name: name] retain];
 
-	return subject;
+	return _subject;
 }
 
 - (OFDictionary*)subjectAlternativeName
@@ -137,19 +137,20 @@
 	OFMutableDictionary *ret;
 	int i;
 
-	if (subjectAlternativeName != nil)
-		return [[subjectAlternativeName copy] autorelease];
+	if (_subjectAlternativeName != nil)
+		return [[_subjectAlternativeName copy] autorelease];
 
 	ret = [OFMutableDictionary dictionary];
 	pool = [[OFAutoreleasePool alloc] init];
 
 	i = -1;
-	while ((i = X509_get_ext_by_NID(crt, NID_subject_alt_name, i)) != -1) {
+	while ((i = X509_get_ext_by_NID(_certificate,
+	    NID_subject_alt_name, i)) != -1) {
 		X509_EXTENSION *extension;
 		STACK_OF(GENERAL_NAME) *values;
 		int j, count;
 
-		if ((extension = X509_get_ext(crt, i)) == NULL)
+		if ((extension = X509_get_ext(_certificate, i)) == NULL)
 			break;
 
 		if ((values = X509V3_EXT_d2i(extension)) == NULL)
@@ -248,7 +249,7 @@
 	[pool release];
 
 	[ret makeImmutable];
-	subjectAlternativeName = [ret retain];
+	_subjectAlternativeName = [ret retain];
 
 	return ret;
 }
@@ -434,12 +435,12 @@
 @end
 
 @implementation X509OID
-- initWithUTF8String: (const char*) str
+- initWithUTF8String: (const char*)string
 {
 	self = [self init];
 
 	@try {
-		string = [[OFString alloc] initWithUTF8String: str];
+		_string = [[OFString alloc] initWithUTF8String: string];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -450,14 +451,14 @@
 
 - (void)dealloc
 {
-	[string release];
+	[_string release];
 	[super dealloc];
 }
 
 - (OFString*)description
 {
 	char tmp[1024];
-	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj([string UTF8String], 1), 0);
+	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj([_string UTF8String], 1), 0);
 	return [OFString stringWithUTF8String: tmp];
 }
 
@@ -465,14 +466,14 @@
 {
 	if (([object isKindOfClass: [OFString class]]) ||
 	    ([object isKindOfClass: [X509OID class]]))
-		return [object isEqual: string];
+		return [object isEqual: _string];
 
 	return NO;
 }
 
 - (uint32_t)hash
 {
-	return [string hash];
+	return [_string hash];
 }
 
 - copy

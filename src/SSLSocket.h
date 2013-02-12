@@ -29,15 +29,13 @@
 
 @interface SSLSocket: OFTCPSocket
 {
-	SSL *ssl;
-	OFString *privateKeyFile;
-	OFString *certificateFile;
-	BOOL requestsClientCertificates;
+	SSL *_SSL;
+	OFString *_privateKeyFile, *_certificateFile;
+	BOOL _requestsClientCertificates;
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property (copy) OFString *privateKeyFile;
-@property (copy) OFString *certificateFile;
+@property (copy) OFString *privateKeyFile, *certificateFile;
 @property BOOL requestsClientCertificates;
 #endif
 

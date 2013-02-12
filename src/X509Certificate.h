@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
+ * Copyright (c) 2013, Jonathan Schleifer <js@webkeks.org>
  *
  * https://webkeks.org/git/?p=objopenssl.git
  *
@@ -42,18 +43,18 @@
 
 @interface X509OID: OFObject <OFCopying>
 {
-	OFString *string;
+	OFString *_string;
 }
 
-- initWithUTF8String: (const char*)str;
+- initWithUTF8String: (const char*)string;
 @end
 
 @interface X509Certificate: OFObject
 {
-	X509 *crt;
-	OFDictionary *issuer;
-	OFDictionary *subject;
-	OFDictionary *subjectAlternativeName;
+	X509 *_certificate;
+	OFDictionary *_issuer;
+	OFDictionary *_subject;
+	OFDictionary *_subjectAlternativeName;
 }
 
 #ifdef OF_HAVE_PROPERTIES

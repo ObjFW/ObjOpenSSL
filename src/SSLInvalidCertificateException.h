@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
+ * Copyright (c) 2013, Jonathan Schleifer <js@webkeks.org>
  *
  * https://webkeks.org/git/?p=objopenssl.git
  *
@@ -25,7 +26,7 @@
 
 @interface SSLInvalidCertificateException: OFException
 {
-	OFString *reason;
+	OFString *_reason;
 }
 
 #ifdef OF_HAVE_PROPERTIES

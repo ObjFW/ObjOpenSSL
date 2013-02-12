@@ -121,37 +121,38 @@ locking_callback(int mode, int n, const char *file, int line)
 }
 
 -  initWithSocket: (OFTCPSocket*)socket
-   privateKeyFile: (OFString*)privateKeyFile_
-  certificateFile: (OFString*)certificateFile_
+   privateKeyFile: (OFString*)privateKeyFile
+  certificateFile: (OFString*)certificateFile
 {
 	self = [self init];
 
 	@try {
 		/* FIXME: Also allow with accepted sockets */
 
-		privateKeyFile = [privateKeyFile_ copy];
-		certificateFile = [certificateFile_ copy];
+		_privateKeyFile = [privateKeyFile copy];
+		_certificateFile = [certificateFile copy];
 
-		sock = dup(socket->sock);
+		_socket = dup(socket->_socket);
 
-		if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
-			close(sock);
-			sock = INVALID_SOCKET;
+		if ((_SSL = SSL_new(ctx)) == NULL ||
+		    !SSL_set_fd(_SSL, _socket)) {
+			close(_socket);
+			_socket = INVALID_SOCKET;
 			@throw [OFInitializationFailedException
 			    exceptionWithClass: [self class]];
 		}
 
-		SSL_set_connect_state(ssl);
+		SSL_set_connect_state(_SSL);
 
-		if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-		    [privateKeyFile cStringWithEncoding:
+		if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
+		    [_privateKeyFile cStringWithEncoding:
 		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
-		    (certificateFile != nil && !SSL_use_certificate_file(ssl,
-		    [certificateFile cStringWithEncoding:
+		    (_certificateFile != nil && !SSL_use_certificate_file(_SSL,
+		    [_certificateFile cStringWithEncoding:
 		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
-		    SSL_connect(ssl) != 1) {
-			close(sock);
-			sock = INVALID_SOCKET;
+		    SSL_connect(_SSL) != 1) {
+			close(_socket);
+			_socket = INVALID_SOCKET;
 			@throw [OFInitializationFailedException
 			    exceptionWithClass: [self class]];
 		}
@@ -165,15 +166,15 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)dealloc
 {
-	SSL *ssl_ = ssl;
+	SSL *SSL_ = _SSL;
 
-	[privateKeyFile release];
-	[certificateFile release];
+	[_privateKeyFile release];
+	[_certificateFile release];
 
 	[super dealloc];
 
-	if (ssl_ != NULL)
-		SSL_free(ssl_);
+	if (SSL_ != NULL)
+		SSL_free(SSL_);
 }
 
 - (void)connectToHost: (OFString*)host
@@ -182,7 +183,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	[super connectToHost: host
 			port: port];
 
-	if ((ssl = SSL_new(ctx)) == NULL || !SSL_set_fd(ssl, sock)) {
+	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
 		    exceptionWithClass: [self class]
@@ -191,14 +192,14 @@ locking_callback(int mode, int n, const char *file, int line)
 				  port: port];
 	}
 
-	SSL_set_connect_state(ssl);
+	SSL_set_connect_state(_SSL);
 
-	if ((privateKeyFile != nil && !SSL_use_PrivateKey_file(ssl,
-	    [privateKeyFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
-	    SSL_FILETYPE_PEM)) || (certificateFile != nil &&
-	    !SSL_use_certificate_file(ssl, [certificateFile
+	if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
+	    [_privateKeyFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    SSL_FILETYPE_PEM)) || (_certificateFile != nil &&
+	    !SSL_use_certificate_file(_SSL, [_certificateFile
 	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
-	    SSL_FILETYPE_PEM)) || SSL_connect(ssl) != 1) {
+	    SSL_FILETYPE_PEM)) || SSL_connect(_SSL) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException
 		    exceptionWithClass: [self class]
@@ -210,45 +211,45 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (SSLSocket*)accept
 {
-	SSLSocket *newSocket = (SSLSocket*)[super accept];
+	SSLSocket *client = (SSLSocket*)[super accept];
 
-	if ((newSocket->ssl = SSL_new(ctx)) == NULL ||
-	    !SSL_set_fd(newSocket->ssl, newSocket->sock)) {
+	if ((client->_SSL = SSL_new(ctx)) == NULL ||
+	    !SSL_set_fd(client->_SSL, client->_socket)) {
 		/* We only want to close the OFTCPSocket */
-		object_setClass(newSocket, [OFTCPSocket class]);
-		[newSocket close];
-		object_setClass(newSocket, object_getClass(self));
+		object_setClass(client, [OFTCPSocket class]);
+		[client close];
+		object_setClass(client, object_getClass(self));
 
 		@throw [OFAcceptFailedException exceptionWithClass: [self class]
 							    socket: self];
 	}
 
-	if (requestsClientCertificates)
-		SSL_set_verify(newSocket->ssl, SSL_VERIFY_PEER, NULL);
+	if (_requestsClientCertificates)
+		SSL_set_verify(client->_SSL, SSL_VERIFY_PEER, NULL);
 
-	SSL_set_accept_state(newSocket->ssl);
+	SSL_set_accept_state(client->_SSL);
 
-	if (!SSL_use_PrivateKey_file(newSocket->ssl, [privateKeyFile
+	if (!SSL_use_PrivateKey_file(client->_SSL, [_privateKeyFile
 	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
-	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(newSocket->ssl,
-	    [certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
-	    SSL_FILETYPE_PEM) || SSL_accept(newSocket->ssl) != 1) {
+	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(client->_SSL,
+	    [_certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    SSL_FILETYPE_PEM) || SSL_accept(client->_SSL) != 1) {
 		/* We only want to close the OFTCPSocket */
-		object_setClass(newSocket, [OFTCPSocket class]);
-		[newSocket close];
-		object_setClass(newSocket, object_getClass(self));
+		object_setClass(client, [OFTCPSocket class]);
+		[client close];
+		object_setClass(client, object_getClass(self));
 
 		@throw [OFAcceptFailedException exceptionWithClass: [self class]
 							    socket: self];
 	}
 
-	return newSocket;
+	return client;
 }
 
 - (void)close
 {
-	if (ssl != NULL)
-		SSL_shutdown(ssl);
+	if (_SSL != NULL)
+		SSL_shutdown(_SSL);
 
 	[super close];
 }
@@ -261,27 +262,27 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exceptionWithClass: [self class]];
 
-	if (sock == INVALID_SOCKET)
+	if (_socket == INVALID_SOCKET)
 		@throw [OFNotConnectedException exceptionWithClass: [self class]
 							    socket: self];
 
-	if (atEndOfStream) {
+	if (_atEndOfStream) {
 		OFReadFailedException *e;
 
 		e = [OFReadFailedException exceptionWithClass: [self class]
 						       stream: self
 					      requestedLength: length];
 #ifndef _WIN32
-		e->errNo = ENOTCONN;
+		e->_errNo = ENOTCONN;
 #else
-		e->errNo = WSAENOTCONN;
+		e->_errNo = WSAENOTCONN;
 #endif
 
 		@throw e;
 	}
 
-	if ((ret = SSL_read(ssl, buffer, (int)length)) < 0) {
-		if (SSL_get_error(ssl, ret) ==  SSL_ERROR_WANT_READ)
+	if ((ret = SSL_read(_SSL, buffer, (int)length)) < 0) {
+		if (SSL_get_error(_SSL, ret) ==  SSL_ERROR_WANT_READ)
 			return 0;
 
 		@throw [OFReadFailedException exceptionWithClass: [self class]
@@ -290,7 +291,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	if (ret == 0)
-		atEndOfStream = YES;
+		_atEndOfStream = YES;
 
 	return ret;
 }
@@ -301,11 +302,11 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exceptionWithClass: [self class]];
 
-	if (sock == INVALID_SOCKET)
+	if (_socket == INVALID_SOCKET)
 		@throw [OFNotConnectedException exceptionWithClass: [self class]
 							    socket: self];
 
-	if (atEndOfStream) {
+	if (_atEndOfStream) {
 		OFWriteFailedException *e;
 
 		e = [OFWriteFailedException exceptionWithClass: [self class]
@@ -313,15 +314,15 @@ locking_callback(int mode, int n, const char *file, int line)
 					       requestedLength: length];
 
 #ifndef _WIN32
-		e->errNo = ENOTCONN;
+		e->_errNo = ENOTCONN;
 #else
-		e->errNo = WSAENOTCONN;
+		e->_errNo = WSAENOTCONN;
 #endif
 
 		@throw e;
 	}
 
-	if (SSL_write(ssl, buffer, (int)length) < length)
+	if (SSL_write(_SSL, buffer, (int)length) < length)
 		@throw [OFWriteFailedException exceptionWithClass: [self class]
 							   stream: self
 						  requestedLength: length];
@@ -329,40 +330,40 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (size_t)pendingBytes
 {
-	if (ssl == NULL)
+	if (_SSL == NULL)
 		return [super pendingBytes];
 
-	return [super pendingBytes] + SSL_pending(ssl);
+	return [super pendingBytes] + SSL_pending(_SSL);
 }
 
-- (void)setPrivateKeyFile: (OFString*)file
+- (void)setPrivateKeyFile: (OFString*)privateKeyFile
 {
-	OF_SETTER(privateKeyFile, file, YES, YES)
+	OF_SETTER(_privateKeyFile, privateKeyFile, YES, YES)
 }
 
 - (OFString*)privateKeyFile
 {
-	OF_GETTER(privateKeyFile, YES)
+	OF_GETTER(_privateKeyFile, YES)
 }
 
-- (void)setCertificateFile: (OFString*)file
+- (void)setCertificateFile: (OFString*)certificateFile
 {
-	OF_SETTER(certificateFile, file, YES, YES)
+	OF_SETTER(_certificateFile, certificateFile, YES, YES)
 }
 
 - (OFString*)certificateFile
 {
-	OF_GETTER(certificateFile, YES)
+	OF_GETTER(_certificateFile, YES)
 }
 
 - (void)setRequestsClientCertificates: (BOOL)enabled
 {
-	requestsClientCertificates = enabled;
+	_requestsClientCertificates = enabled;
 }
 
 - (BOOL)requestsClientCertificates
 {
-	return requestsClientCertificates;
+	return _requestsClientCertificates;
 }
 
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type
@@ -376,15 +377,15 @@ locking_callback(int mode, int n, const char *file, int line)
 		    exceptionWithClass: [self class]
 			      selector: _cmd];
 
-	if (SSL_session_reused(ssl) ^ !listening) {
+	if (SSL_session_reused(_SSL) ^ !_listening) {
 		/*
 		 * We are either client or the session has been resumed
 		 * => we have sent the finished message
 		 */
-		length = SSL_get_finished(ssl, buffer, 64);
+		length = SSL_get_finished(_SSL, buffer, 64);
 	} else {
 		/* peer sent the finished message */
-		length = SSL_get_peer_finished(ssl, buffer, 64);
+		length = SSL_get_peer_finished(_SSL, buffer, 64);
 	}
 
 	data = [OFDataArray dataArray];
@@ -396,7 +397,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (X509Certificate*)peerCertificate
 {
-	X509 *certificate = SSL_get_peer_certificate(ssl);
+	X509 *certificate = SSL_get_peer_certificate(_SSL);
 
 	if (!certificate)
 		return nil;
@@ -409,8 +410,8 @@ locking_callback(int mode, int n, const char *file, int line)
 {
 	unsigned long ret;
 
-	if (SSL_get_peer_certificate(ssl) != NULL) {
-		if ((ret = SSL_get_verify_result(ssl)) != X509_V_OK) {
+	if (SSL_get_peer_certificate(_SSL) != NULL) {
+		if ((ret = SSL_get_verify_result(_SSL)) != X509_V_OK) {
 			const char *tmp = X509_verify_cert_error_string(ret);
 			OFString *reason = [OFString stringWithUTF8String: tmp];
 			@throw [SSLInvalidCertificateException
