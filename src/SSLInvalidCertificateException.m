@@ -67,13 +67,9 @@
 
 - (OFString*)description
 {
-	if (_description != nil)
-		return _description;
-
-	_description = [[OFString alloc] initWithFormat:
-	    @"Invalid certificate! Reason: %@", _reason];
-
-	return _description;
+	return [OFString stringWithFormat:
+	    @"Invalid certificate in class %@! Reason: %@", [self inClass],
+	    _reason];
 }
 
 - (OFString*)reason
