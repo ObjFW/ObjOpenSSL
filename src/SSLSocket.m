@@ -215,11 +215,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
 	    !SSL_set_fd(client->_SSL, client->_socket)) {
-		/* We only want to close the OFTCPSocket */
-		object_setClass(client, [OFTCPSocket class]);
-		[client close];
-		object_setClass(client, object_getClass(self));
-
+		[client SSL_super_close];
 		@throw [OFAcceptFailedException exceptionWithClass: [self class]
 							    socket: self];
 	}
@@ -234,11 +230,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(client->_SSL,
 	    [_certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM) || SSL_accept(client->_SSL) != 1) {
-		/* We only want to close the OFTCPSocket */
-		object_setClass(client, [OFTCPSocket class]);
-		[client close];
-		object_setClass(client, object_getClass(self));
-
+		[client SSL_super_close];
 		@throw [OFAcceptFailedException exceptionWithClass: [self class]
 							    socket: self];
 	}
@@ -251,6 +243,11 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_SSL != NULL)
 		SSL_shutdown(_SSL);
 
+	[super close];
+}
+
+- (void)SSL_super_close
+{
 	[super close];
 }
 

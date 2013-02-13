@@ -43,8 +43,8 @@
 -  initWithSocket: (OFTCPSocket*)socket
    privateKeyFile: (OFString*)privateKeyFile
   certificateFile: (OFString*)certificateFile;
-/* Change the return type */
-- (SSLSocket*)accept;
+- (void)SSL_super_close;
+- (SSLSocket*)accept;	/* Changes the return type */
 - (void)setPrivateKeyFile: (OFString*)file;
 - (OFString*)privateKeyFile;
 - (void)setCertificateFile: (OFString*)file;
