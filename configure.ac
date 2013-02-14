@@ -20,6 +20,9 @@ OBJCFLAGS="$OBJCFLAGS -Wall $($OBJFW_CONFIG --objcflags)"
 LDFLAGS="$LDFLAGS $($OBJFW_CONFIG --ldflags)"
 LIBS="$LIBS $($OBJFW_CONFIG --libs)"
 
+AX_CHECK_COMPILER_FLAGS(-Wdocumentation,
+	[OBJCFLAGS="$OBJCFLAGS -Wdocumentation"])
+
 AC_ARG_ENABLE(shared,
 	AS_HELP_STRING([--disable-shared], [do not build shared library]))
 AS_IF([test x"$enable_shared" != x"no"], [
