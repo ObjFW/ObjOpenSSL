@@ -131,7 +131,7 @@
 		4B1918E01341272300D82152 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 4B1918E31341272300D82152 /* Build configuration list for PBXProject "ObjOpenSSL" */;
 			compatibilityVersion = "Xcode 3.2";

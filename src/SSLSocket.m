@@ -325,12 +325,12 @@ locking_callback(int mode, int n, const char *file, int line)
 						  requestedLength: length];
 }
 
-- (size_t)pendingBytes
+- (size_t)numberOfBytesInReadBuffer
 {
 	if (_SSL == NULL)
-		return [super pendingBytes];
+		return [super numberOfBytesInReadBuffer];
 
-	return [super pendingBytes] + SSL_pending(_SSL);
+	return [super numberOfBytesInReadBuffer] + SSL_pending(_SSL);
 }
 
 - (void)setPrivateKeyFile: (OFString*)privateKeyFile
