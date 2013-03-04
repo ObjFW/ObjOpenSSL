@@ -66,11 +66,11 @@
 - (OFDictionary*)issuer;
 - (OFDictionary*)subject;
 - (OFDictionary*)subjectAlternativeName;
-- (BOOL)hasCommonNameMatchingDomain: (OFString*)domain;
-- (BOOL)hasDNSNameMatchingDomain: (OFString*)domain;
-- (BOOL)hasSRVNameMatchingDomain: (OFString*)domain
+- (bool)hasCommonNameMatchingDomain: (OFString*)domain;
+- (bool)hasDNSNameMatchingDomain: (OFString*)domain;
+- (bool)hasSRVNameMatchingDomain: (OFString*)domain
 			 service: (OFString*)service;
-- (BOOL)X509_isAssertedDomain: (OFString*)asserted
+- (bool)X509_isAssertedDomain: (OFString*)asserted
 		  equalDomain: (OFString*)domain;
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
 - (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;

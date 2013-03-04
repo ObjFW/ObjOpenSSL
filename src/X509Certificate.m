@@ -254,7 +254,7 @@
 	return ret;
 }
 
-- (BOOL)hasCommonNameMatchingDomain: (OFString*)domain
+- (bool)hasCommonNameMatchingDomain: (OFString*)domain
 {
 	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -265,15 +265,15 @@
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
-			return YES;
+			return true;
 		}
 	}
 
 	[pool release];
-	return NO;
+	return false;
 }
 
-- (BOOL)hasDNSNameMatchingDomain: (OFString*)domain
+- (bool)hasDNSNameMatchingDomain: (OFString*)domain
 {
 	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -285,15 +285,15 @@
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
-			return YES;
+			return true;
 		}
 	}
 
 	[pool release];
-	return NO;
+	return false;
 }
 
-- (BOOL)hasSRVNameMatchingDomain: (OFString*)domain
+- (bool)hasSRVNameMatchingDomain: (OFString*)domain
 			 service: (OFString*)service
 {
 	size_t serviceLength;
@@ -318,16 +318,16 @@
 			if ([self X509_isAssertedDomain: asserted
 					    equalDomain: domain]) {
 				[pool release];
-				return YES;
+				return true;
 			}
 		}
 	}
 
 	[pool release];
-	return NO;
+	return false;
 }
 
-- (BOOL)X509_isAssertedDomain: (OFString*)asserted
+- (bool)X509_isAssertedDomain: (OFString*)asserted
 		  equalDomain: (OFString*)domain
 {
 	/*
@@ -340,25 +340,25 @@
 	size_t firstDot;
 
 	if ([asserted caseInsensitiveCompare: domain] == OF_ORDERED_SAME)
-		return YES;
+		return true;
 
 	if (![asserted hasPrefix: @"*."])
-		return NO;
+		return false;
 
 	asserted = [asserted substringWithRange:
 	    of_range(2, [asserted length] - 2)];
 
 	firstDot = [domain rangeOfString: @"."].location;
 	if (firstDot == OF_NOT_FOUND)
-		return NO;
+		return false;
 
 	domain = [domain substringWithRange:
 	    of_range(firstDot + 1, [domain length] - firstDot - 1)];
 
 	if (![asserted caseInsensitiveCompare: domain])
-		return YES;
+		return true;
 
-	return NO;
+	return false;
 }
 
 - (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name
@@ -462,7 +462,7 @@
 	return [OFString stringWithUTF8String: tmp];
 }
 
-- (BOOL)isEqual: (id)object
+- (bool)isEqual: (id)object
 {
 	if ([object isKindOfClass: [X509OID class]]) {
 		X509OID *OID = object;
@@ -473,7 +473,7 @@
 	if ([object isKindOfClass: [OFString class]])
 		return [_string isEqual: object];
 
-	return NO;
+	return false;
 }
 
 - (uint32_t)hash

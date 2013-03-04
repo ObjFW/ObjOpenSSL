@@ -288,7 +288,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	if (ret == 0)
-		_atEndOfStream = YES;
+		_atEndOfStream = true;
 
 	return ret;
 }
@@ -335,30 +335,30 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)setPrivateKeyFile: (OFString*)privateKeyFile
 {
-	OF_SETTER(_privateKeyFile, privateKeyFile, YES, YES)
+	OF_SETTER(_privateKeyFile, privateKeyFile, true, 1)
 }
 
 - (OFString*)privateKeyFile
 {
-	OF_GETTER(_privateKeyFile, YES)
+	OF_GETTER(_privateKeyFile, true)
 }
 
 - (void)setCertificateFile: (OFString*)certificateFile
 {
-	OF_SETTER(_certificateFile, certificateFile, YES, YES)
+	OF_SETTER(_certificateFile, certificateFile, true, 1)
 }
 
 - (OFString*)certificateFile
 {
-	OF_GETTER(_certificateFile, YES)
+	OF_GETTER(_certificateFile, true)
 }
 
-- (void)setRequestsClientCertificates: (BOOL)enabled
+- (void)setRequestsClientCertificates: (bool)enabled
 {
 	_requestsClientCertificates = enabled;
 }
 
-- (BOOL)requestsClientCertificates
+- (bool)requestsClientCertificates
 {
 	return _requestsClientCertificates;
 }

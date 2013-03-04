@@ -74,6 +74,6 @@
 
 - (OFString*)reason
 {
-	OF_GETTER(_reason, NO)
+	OF_GETTER(_reason, false)
 }
 @end
