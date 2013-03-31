@@ -24,31 +24,24 @@
 #include <openssl/ssl.h>
 
 #import <ObjFW/OFTCPSocket.h>
+#import <ObjFW/OFTLSSocket.h>
 
 @class X509Certificate;
 
-@interface SSLSocket: OFTCPSocket
+@interface SSLSocket: OFTCPSocket <OFTLSSocket>
 {
 	SSL *_SSL;
-	OFString *_privateKeyFile, *_certificateFile;
+	OFString *_certificateFile, *_privateKeyFile;
+	const char *_privateKeyPassphrase;
 	bool _requestsClientCertificates;
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property (copy) OFString *privateKeyFile, *certificateFile;
 @property bool requestsClientCertificates;
 #endif
 
 - initWithSocket: (OFTCPSocket*)socket;
--  initWithSocket: (OFTCPSocket*)socket
-   privateKeyFile: (OFString*)privateKeyFile
-  certificateFile: (OFString*)certificateFile;
 - (void)SSL_super_close;
-- (SSLSocket*)accept;	/* Changes the return type */
-- (void)setPrivateKeyFile: (OFString*)file;
-- (OFString*)privateKeyFile;
-- (void)setCertificateFile: (OFString*)file;
-- (OFString*)certificateFile;
 - (void)setRequestsClientCertificates: (bool)enabled;
 - (bool)requestsClientCertificates;
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type;

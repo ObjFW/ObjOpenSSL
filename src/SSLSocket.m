@@ -115,51 +115,9 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - initWithSocket: (OFTCPSocket*)socket
 {
-	return [self initWithSocket: socket
-		     privateKeyFile: nil
-		    certificateFile: nil];
-}
-
--  initWithSocket: (OFTCPSocket*)socket
-   privateKeyFile: (OFString*)privateKeyFile
-  certificateFile: (OFString*)certificateFile
-{
 	self = [self init];
 
-	@try {
-		/* FIXME: Also allow with accepted sockets */
-
-		_privateKeyFile = [privateKeyFile copy];
-		_certificateFile = [certificateFile copy];
-
-		_socket = dup(socket->_socket);
-
-		if ((_SSL = SSL_new(ctx)) == NULL ||
-		    !SSL_set_fd(_SSL, _socket)) {
-			close(_socket);
-			_socket = INVALID_SOCKET;
-			@throw [OFInitializationFailedException
-			    exceptionWithClass: [self class]];
-		}
-
-		SSL_set_connect_state(_SSL);
-
-		if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
-		    [_privateKeyFile cStringWithEncoding:
-		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
-		    (_certificateFile != nil && !SSL_use_certificate_file(_SSL,
-		    [_certificateFile cStringWithEncoding:
-		    OF_STRING_ENCODING_NATIVE], SSL_FILETYPE_PEM)) ||
-		    SSL_connect(_SSL) != 1) {
-			close(_socket);
-			_socket = INVALID_SOCKET;
-			@throw [OFInitializationFailedException
-			    exceptionWithClass: [self class]];
-		}
-	} @catch (id e) {
-		[self release];
-		@throw e;
-	}
+	_socket = dup(socket->_socket);
 
 	return self;
 }
@@ -177,19 +135,15 @@ locking_callback(int mode, int n, const char *file, int line)
 		SSL_free(SSL_);
 }
 
-- (void)connectToHost: (OFString*)host
-		 port: (uint16_t)port
+- (void)startTLS
 {
-	[super connectToHost: host
-			port: port];
-
 	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
 		    exceptionWithClass: [self class]
 				socket: self
-				  host: host
-				  port: port];
+				  host: nil
+				  port: 0];
 	}
 
 	SSL_set_connect_state(_SSL);
@@ -204,12 +158,29 @@ locking_callback(int mode, int n, const char *file, int line)
 		@throw [OFConnectionFailedException
 		    exceptionWithClass: [self class]
 				socket: self
+				  host: nil
+				  port: 0];
+	}
+}
+
+- (void)connectToHost: (OFString*)host
+		 port: (uint16_t)port
+{
+	[super connectToHost: host
+			port: port];
+
+	@try {
+		[self startTLS];
+	} @catch (OFConnectionFailedException *e) {
+		@throw [OFConnectionFailedException
+		    exceptionWithClass: [self class]
+				socket: self
 				  host: host
 				  port: port];
 	}
 }
 
-- (SSLSocket*)accept
+- (instancetype)accept
 {
 	SSLSocket *client = (SSLSocket*)[super accept];
 
@@ -333,14 +304,17 @@ locking_callback(int mode, int n, const char *file, int line)
 	return [super numberOfBytesInReadBuffer] + SSL_pending(_SSL);
 }
 
-- (void)setPrivateKeyFile: (OFString*)privateKeyFile
+- (void)setDelegate: (id <OFTLSSocketDelegate>)delegate
 {
-	OF_SETTER(_privateKeyFile, privateKeyFile, true, 1)
+	/* FIXME */
+	[self doesNotRecognizeSelector: _cmd];
+	abort();
 }
 
-- (OFString*)privateKeyFile
+- (id <OFTLSSocketDelegate>)delegate
 {
-	OF_GETTER(_privateKeyFile, true)
+	/* FIXME */
+	return nil;
 }
 
 - (void)setCertificateFile: (OFString*)certificateFile
@@ -351,6 +325,27 @@ locking_callback(int mode, int n, const char *file, int line)
 - (OFString*)certificateFile
 {
 	OF_GETTER(_certificateFile, true)
+}
+
+- (void)setPrivateKeyFile: (OFString*)privateKeyFile
+{
+	OF_SETTER(_privateKeyFile, privateKeyFile, true, 1)
+}
+
+- (OFString*)privateKeyFile
+{
+	OF_GETTER(_privateKeyFile, true)
+}
+
+- (void)setPrivateKeyPassphrase: (const char*)privateKeyPassphrase
+{
+	/* FIXME */
+}
+
+- (const char*)privateKeyPassphrase
+{
+	/* FIXME */
+	return NULL;
 }
 
 - (void)setRequestsClientCertificates: (bool)enabled

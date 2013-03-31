@@ -21,11 +21,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+
 #import "SSLInvalidCertificateException.h"
 
 #import <ObjFW/macros.h>
-
-#import <ObjFW/OFNotImplementedException.h>
 
 @implementation SSLInvalidCertificateException
 + exceptionWithClass: (Class)class
@@ -37,10 +37,14 @@
 
 - initWithClass: (Class)class
 {
-	Class c = [self class];
-	[self release];
-	@throw [OFNotImplementedException exceptionWithClass: c
-						    selector: _cmd];
+	@try {
+		[self doesNotRecognizeSelector: _cmd];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
+
+	abort();
 }
 
 - initWithClass: (Class)class
