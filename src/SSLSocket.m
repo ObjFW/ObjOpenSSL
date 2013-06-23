@@ -140,10 +140,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
-		    exceptionWithClass: [self class]
-				socket: self
-				  host: nil
-				  port: 0];
+		    exceptionWithHost: nil
+				 port: 0
+			       socket: self];
 	}
 
 	SSL_set_connect_state(_SSL);
@@ -156,10 +155,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	    SSL_FILETYPE_PEM)) || SSL_connect(_SSL) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException
-		    exceptionWithClass: [self class]
-				socket: self
-				  host: nil
-				  port: 0];
+		    exceptionWithHost: nil
+				 port: 0
+			       socket: self];
 	}
 }
 
@@ -169,15 +167,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	[super connectToHost: host
 			port: port];
 
-	@try {
-		[self startTLS];
-	} @catch (OFConnectionFailedException *e) {
-		@throw [OFConnectionFailedException
-		    exceptionWithClass: [self class]
-				socket: self
-				  host: host
-				  port: port];
-	}
+	[self startTLS];
 }
 
 - (instancetype)accept
@@ -187,8 +177,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
 	    !SSL_set_fd(client->_SSL, client->_socket)) {
 		[client SSL_super_close];
-		@throw [OFAcceptFailedException exceptionWithClass: [self class]
-							    socket: self];
+		@throw [OFAcceptFailedException exceptionWithSocket: self];
 	}
 
 	if (_requestsClientCertificates)
@@ -202,8 +191,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	    [_certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
 	    SSL_FILETYPE_PEM) || SSL_accept(client->_SSL) != 1) {
 		[client SSL_super_close];
-		@throw [OFAcceptFailedException exceptionWithClass: [self class]
-							    socket: self];
+		@throw [OFAcceptFailedException exceptionWithSocket: self];
 	}
 
 	return client;
@@ -228,18 +216,16 @@ locking_callback(int mode, int n, const char *file, int line)
 	ssize_t ret;
 
 	if (length > INT_MAX)
-		@throw [OFOutOfRangeException exceptionWithClass: [self class]];
+		@throw [OFOutOfRangeException exception];
 
 	if (_socket == INVALID_SOCKET)
-		@throw [OFNotConnectedException exceptionWithClass: [self class]
-							    socket: self];
+		@throw [OFNotConnectedException exceptionWithSocket: self];
 
 	if (_atEndOfStream) {
 		OFReadFailedException *e;
 
-		e = [OFReadFailedException exceptionWithClass: [self class]
-						       stream: self
-					      requestedLength: length];
+		e = [OFReadFailedException exceptionWithStream: self
+					       requestedLength: length];
 #ifndef _WIN32
 		e->_errNo = ENOTCONN;
 #else
@@ -253,9 +239,8 @@ locking_callback(int mode, int n, const char *file, int line)
 		if (SSL_get_error(_SSL, ret) ==  SSL_ERROR_WANT_READ)
 			return 0;
 
-		@throw [OFReadFailedException exceptionWithClass: [self class]
-							  stream: self
-						 requestedLength: length];
+		@throw [OFReadFailedException exceptionWithStream: self
+						  requestedLength: length];
 	}
 
 	if (ret == 0)
@@ -268,18 +253,16 @@ locking_callback(int mode, int n, const char *file, int line)
 		     length: (size_t)length
 {
 	if (length > INT_MAX)
-		@throw [OFOutOfRangeException exceptionWithClass: [self class]];
+		@throw [OFOutOfRangeException exception];
 
 	if (_socket == INVALID_SOCKET)
-		@throw [OFNotConnectedException exceptionWithClass: [self class]
-							    socket: self];
+		@throw [OFNotConnectedException exceptionWithSocket: self];
 
 	if (_atEndOfStream) {
 		OFWriteFailedException *e;
 
-		e = [OFWriteFailedException exceptionWithClass: [self class]
-							stream: self
-					       requestedLength: length];
+		e = [OFWriteFailedException exceptionWithStream: self
+						requestedLength: length];
 
 #ifndef _WIN32
 		e->_errNo = ENOTCONN;
@@ -291,9 +274,8 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	if (SSL_write(_SSL, buffer, (int)length) < length)
-		@throw [OFWriteFailedException exceptionWithClass: [self class]
-							   stream: self
-						  requestedLength: length];
+		@throw [OFWriteFailedException exceptionWithStream: self
+						   requestedLength: length];
 }
 
 - (size_t)numberOfBytesInReadBuffer
@@ -365,9 +347,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	OFDataArray *data;
 
 	if (![type isEqual: @"tls-unique"])
-		@throw [OFInvalidArgumentException
-		    exceptionWithClass: [self class]
-			      selector: _cmd];
+		@throw [OFInvalidArgumentException exception];
 
 	if (SSL_session_reused(_SSL) ^ !_listening) {
 		/*
@@ -407,12 +387,10 @@ locking_callback(int mode, int n, const char *file, int line)
 			const char *tmp = X509_verify_cert_error_string(ret);
 			OFString *reason = [OFString stringWithUTF8String: tmp];
 			@throw [SSLInvalidCertificateException
-			    exceptionWithClass: [self class]
-					reason: reason];
+			    exceptionWithReason: reason];
 		}
 	} else
 		@throw [SSLInvalidCertificateException
-		    exceptionWithClass: [self class]
-				reason: @"No certificate"];
+		    exceptionWithReason: @"No certificate"];
 }
 @end

@@ -53,7 +53,7 @@
 		_certificate = d2i_X509(NULL, &dataCArray, [data count]);
 		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
-				    exceptionWithClass: [self class]];
+			    exceptionWithClass: [self class]];
 
 		[pool release];
 	} @catch (id e) {
@@ -72,7 +72,7 @@
 		_certificate = X509_dup(certificate);
 		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
-				    exceptionWithClass: [self class]];
+			    exceptionWithClass: [self class]];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -421,8 +421,7 @@
 	char *buffer;
 
 	if (ASN1_STRING_to_UTF8((unsigned char**)&buffer, str) < 0)
-		@throw [OFInvalidEncodingException
-		    exceptionWithClass: [self class]];
+		@throw [OFInvalidEncodingException exception];
 
 	@try {
 		ret = [OFString stringWithUTF8String: buffer];

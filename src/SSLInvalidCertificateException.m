@@ -28,14 +28,12 @@
 #import <ObjFW/macros.h>
 
 @implementation SSLInvalidCertificateException
-+ exceptionWithClass: (Class)class
-	      reason: (OFString*)reason
++ exceptionWithReason: (OFString*)reason
 {
-	return [[[self alloc] initWithClass: class
-				     reason: reason] autorelease];
+	return [[[self alloc] initWithReason: reason] autorelease];
 }
 
-- initWithClass: (Class)class
+- init
 {
 	@try {
 		[self doesNotRecognizeSelector: _cmd];
@@ -47,10 +45,9 @@
 	abort();
 }
 
-- initWithClass: (Class)class
-	 reason: (OFString*)reason
+- initWithReason: (OFString*)reason
 {
-	self = [super initWithClass: class];
+	self = [super init];
 
 	@try {
 		_reason = [reason copy];
@@ -72,8 +69,7 @@
 - (OFString*)description
 {
 	return [OFString stringWithFormat:
-	    @"Invalid certificate in class %@! Reason: %@", [self inClass],
-	    _reason];
+	    @"Invalid certificate! Reason: %@", _reason];
 }
 
 - (OFString*)reason

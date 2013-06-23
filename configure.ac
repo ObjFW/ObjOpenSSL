@@ -50,7 +50,7 @@ AS_IF([test x"$GOBJC" = x"yes"], [
 	OBJCFLAGS="$OBJCFLAGS -Wwrite-strings -Wpointer-arith"
 	dnl We need -Wno-deprecated-declarations as OpenSSL is deprecated on
 	dnl OS X.
-	OBJCFLAGS="$OBJCFLAGS -Wno-deprecated-declarations" # -Werror
+	OBJCFLAGS="$OBJCFLAGS -Wno-deprecated-declarations"
 ])
 
 BUILDSYS_INIT

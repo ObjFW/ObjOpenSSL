@@ -33,9 +33,7 @@
 @property (readonly, assign) OFString *reason;
 #endif
 
-+ exceptionWithClass: (Class)class
-	      reason: (OFString*)reason;
-- initWithClass: (Class)class
-	 reason: (OFString*)reason;
++ exceptionWithReason: (OFString*)reason;
+- initWithReason: (OFString*)reason;
 - (OFString*)reason;
 @end
