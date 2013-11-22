@@ -30,7 +30,7 @@
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property (readonly, assign) OFString *reason;
+@property (readonly, copy) OFString *reason;
 #endif
 
 + exceptionWithReason: (OFString*)reason;
