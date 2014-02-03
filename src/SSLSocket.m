@@ -137,6 +137,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)startTLS
 {
+	of_string_encoding_t encoding = [OFString nativeOSEncoding];
 	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
@@ -148,10 +149,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	SSL_set_connect_state(_SSL);
 
 	if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
-	    [_privateKeyFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    [_privateKeyFile cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM)) || (_certificateFile != nil &&
 	    !SSL_use_certificate_file(_SSL, [_certificateFile
-	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM)) || SSL_connect(_SSL) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException
@@ -172,6 +173,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (instancetype)accept
 {
+	of_string_encoding_t encoding = [OFString nativeOSEncoding];
 	SSLSocket *client = (SSLSocket*)[super accept];
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
@@ -186,9 +188,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	SSL_set_accept_state(client->_SSL);
 
 	if (!SSL_use_PrivateKey_file(client->_SSL, [_privateKeyFile
-	    cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(client->_SSL,
-	    [_certificateFile cStringWithEncoding: OF_STRING_ENCODING_NATIVE],
+	    [_certificateFile cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM) || SSL_accept(client->_SSL) != 1) {
 		[client SSL_super_close];
 		@throw [OFAcceptFailedException exceptionWithSocket: self];
