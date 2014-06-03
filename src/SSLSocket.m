@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2012, 2013, Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, 2012, 2013, 2014, Jonathan Schleifer <js@webkeks.org>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
@@ -137,7 +137,8 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)startTLS
 {
-	of_string_encoding_t encoding = [OFString nativeOSEncoding];
+	of_string_encoding_t encoding;
+
 	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
@@ -147,6 +148,8 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	SSL_set_connect_state(_SSL);
+
+	encoding = [OFString nativeOSEncoding];
 
 	if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
 	    [_privateKeyFile cStringWithEncoding: encoding],
@@ -173,8 +176,8 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (instancetype)accept
 {
-	of_string_encoding_t encoding = [OFString nativeOSEncoding];
 	SSLSocket *client = (SSLSocket*)[super accept];
+	of_string_encoding_t encoding;
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
 	    !SSL_set_fd(client->_SSL, client->_socket)) {
@@ -187,6 +190,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	SSL_set_accept_state(client->_SSL);
 
+	encoding = [OFString nativeOSEncoding];
 	if (!SSL_use_PrivateKey_file(client->_SSL, [_privateKeyFile
 	    cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(client->_SSL,
@@ -226,7 +230,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_atEndOfStream) {
 		OFReadFailedException *e;
 
-		e = [OFReadFailedException exceptionWithStream: self
+		e = [OFReadFailedException exceptionWithObject: self
 					       requestedLength: length];
 #ifndef _WIN32
 		e->_errNo = ENOTCONN;
@@ -238,10 +242,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	if ((ret = SSL_read(_SSL, buffer, (int)length)) < 0) {
-		if (SSL_get_error(_SSL, ret) ==  SSL_ERROR_WANT_READ)
+		if (SSL_get_error(_SSL, ret) == SSL_ERROR_WANT_READ)
 			return 0;
 
-		@throw [OFReadFailedException exceptionWithStream: self
+		@throw [OFReadFailedException exceptionWithObject: self
 						  requestedLength: length];
 	}
 
@@ -263,7 +267,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_atEndOfStream) {
 		OFWriteFailedException *e;
 
-		e = [OFWriteFailedException exceptionWithStream: self
+		e = [OFWriteFailedException exceptionWithObject: self
 						requestedLength: length];
 
 #ifndef _WIN32
@@ -276,16 +280,16 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 
 	if (SSL_write(_SSL, buffer, (int)length) < length)
-		@throw [OFWriteFailedException exceptionWithStream: self
+		@throw [OFWriteFailedException exceptionWithObject: self
 						   requestedLength: length];
 }
 
-- (size_t)numberOfBytesInReadBuffer
+- (bool)hasDataInReadBuffer
 {
-	if (_SSL == NULL)
-		return [super numberOfBytesInReadBuffer];
+	if (_SSL != NULL && SSL_pending(_SSL) > 0)
+		return true;
 
-	return [super numberOfBytesInReadBuffer] + SSL_pending(_SSL);
+	return [super hasDataInReadBuffer];
 }
 
 - (void)setDelegate: (id <OFTLSSocketDelegate>)delegate
