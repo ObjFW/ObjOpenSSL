@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2011, 2012, 2013, 2014, Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, 2012, 2013, 2014, 2015
+ *     Jonathan Schleifer <js@webkeks.org>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
@@ -32,6 +33,7 @@
 #import <ObjFW/OFThread.h>
 #import <ObjFW/OFHTTPRequest.h>
 #import <ObjFW/OFDataArray.h>
+#import <ObjFW/OFSystemInfo.h>
 
 #import <ObjFW/OFAcceptFailedException.h>
 #import <ObjFW/OFConnectionFailedException.h>
@@ -41,6 +43,7 @@
 #import <ObjFW/OFOutOfRangeException.h>
 #import <ObjFW/OFReadFailedException.h>
 #import <ObjFW/OFWriteFailedException.h>
+
 #import <ObjFW/macros.h>
 #import <ObjFW/threading.h>
 
@@ -149,7 +152,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	SSL_set_connect_state(_SSL);
 
-	encoding = [OFString nativeOSEncoding];
+	encoding = [OFSystemInfo native8BitEncoding];
 
 	if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
 	    [_privateKeyFile cStringWithEncoding: encoding],
@@ -190,7 +193,8 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	SSL_set_accept_state(client->_SSL);
 
-	encoding = [OFString nativeOSEncoding];
+	encoding = [OFSystemInfo native8BitEncoding];
+
 	if (!SSL_use_PrivateKey_file(client->_SSL, [_privateKeyFile
 	    cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM) || !SSL_use_certificate_file(client->_SSL,
