@@ -185,7 +185,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
 	    !SSL_set_fd(client->_SSL, client->_socket)) {
 		[client SSL_super_close];
-		@throw [OFAcceptFailedException exceptionWithSocket: self];
+		/* FIXME: Get a proper errno */
+		@throw [OFAcceptFailedException exceptionWithSocket: self
+							      errNo: 0];
 	}
 
 	if (_requestsClientCertificates)
@@ -201,7 +203,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	    [_certificateFile cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM) || SSL_accept(client->_SSL) != 1) {
 		[client SSL_super_close];
-		@throw [OFAcceptFailedException exceptionWithSocket: self];
+		/* FIXME: Get a proper errno */
+		@throw [OFAcceptFailedException exceptionWithSocket: self
+							      errNo: 0];
 	}
 
 	return client;
@@ -231,19 +235,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotConnectedException exceptionWithSocket: self];
 
-	if (_atEndOfStream) {
-		OFReadFailedException *e;
-
-		e = [OFReadFailedException exceptionWithObject: self
-					       requestedLength: length];
-#ifndef _WIN32
-		e->_errNo = ENOTCONN;
-#else
-		e->_errNo = WSAENOTCONN;
-#endif
-
-		@throw e;
-	}
+	if (_atEndOfStream)
+		@throw [OFReadFailedException exceptionWithObject: self
+						  requestedLength: length
+							    errNo: ENOTCONN];
 
 	if ((ret = SSL_read(_SSL, buffer, (int)length)) < 0) {
 		if (SSL_get_error(_SSL, ret) == SSL_ERROR_WANT_READ)
@@ -268,20 +263,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotConnectedException exceptionWithSocket: self];
 
-	if (_atEndOfStream) {
-		OFWriteFailedException *e;
-
-		e = [OFWriteFailedException exceptionWithObject: self
-						requestedLength: length];
-
-#ifndef _WIN32
-		e->_errNo = ENOTCONN;
-#else
-		e->_errNo = WSAENOTCONN;
-#endif
-
-		@throw e;
-	}
+	if (_atEndOfStream)
+		@throw [OFWriteFailedException exceptionWithObject: self
+						   requestedLength: length
+							     errNo: ENOTCONN];
 
 	if (SSL_write(_SSL, buffer, (int)length) < length)
 		@throw [OFWriteFailedException exceptionWithObject: self
