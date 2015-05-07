@@ -39,7 +39,7 @@
 #import <ObjFW/OFConnectionFailedException.h>
 #import <ObjFW/OFInitializationFailedException.h>
 #import <ObjFW/OFInvalidArgumentException.h>
-#import <ObjFW/OFNotConnectedException.h>
+#import <ObjFW/OFNotOpenException.h>
 #import <ObjFW/OFOutOfRangeException.h>
 #import <ObjFW/OFReadFailedException.h>
 #import <ObjFW/OFWriteFailedException.h>
@@ -233,7 +233,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		@throw [OFOutOfRangeException exception];
 
 	if (_socket == INVALID_SOCKET)
-		@throw [OFNotConnectedException exceptionWithSocket: self];
+		@throw [OFNotOpenException exceptionWithObject: self];
 
 	if (_atEndOfStream)
 		@throw [OFReadFailedException exceptionWithObject: self
@@ -261,7 +261,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		@throw [OFOutOfRangeException exception];
 
 	if (_socket == INVALID_SOCKET)
-		@throw [OFNotConnectedException exceptionWithSocket: self];
+		@throw [OFNotOpenException exceptionWithObject: self];
 
 	if (_atEndOfStream)
 		@throw [OFWriteFailedException exceptionWithObject: self
