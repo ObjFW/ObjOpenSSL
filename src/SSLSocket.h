@@ -33,17 +33,19 @@
 	SSL *_SSL;
 	OFString *_certificateFile, *_privateKeyFile;
 	const char *_privateKeyPassphrase;
-	bool _requestsClientCertificates;
+	bool _certificateVerificationEnabled;
+	bool _requestClientCertificatesEnabled;
 }
 
 #ifdef OF_HAVE_PROPERTIES
-@property bool requestsClientCertificates;
+@property (getter=isRequestClientCertificatesEnabled)
+    bool requestClientCertificatesEnabled;
 #endif
 
 - initWithSocket: (OFTCPSocket*)socket;
 - (void)SSL_super_close;
-- (void)setRequestsClientCertificates: (bool)enabled;
-- (bool)requestsClientCertificates;
+- (void)setRequestClientCertificatesEnabled: (bool)enabled;
+- (bool)isRequestClientCertificatesEnabled;
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type;
 - (X509Certificate*)peerCertificate;
 - (void)verifyPeerCertificate;

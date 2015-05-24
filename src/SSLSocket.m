@@ -27,8 +27,18 @@
 #include <errno.h>
 #include <assert.h>
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wdocumentation"
+#endif
+
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <openssl/x509v3.h>
+
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 
 #import <ObjFW/OFThread.h>
 #import <ObjFW/OFHTTPRequest.h>
@@ -116,11 +126,26 @@ locking_callback(int mode, int n, const char *file, int line)
 		    exceptionWithClass: self];
 }
 
+- init
+{
+	self = [super init];
+
+	_certificateVerificationEnabled = true;
+
+	return self;
+}
+
 - initWithSocket: (OFTCPSocket*)socket
 {
 	self = [self init];
 
-	_socket = dup(socket->_socket);
+	@try {
+		if ((_socket = dup(socket->_socket)) < 0)
+			@throw [OFInitializationFailedException exception];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
 
 	return self;
 }
@@ -138,16 +163,33 @@ locking_callback(int mode, int n, const char *file, int line)
 		SSL_free(SSL_);
 }
 
-- (void)startTLS
+- (void)SSL_startTLSWithExpectedHost: (OFString*)host
+				port: (uint16_t)port
 {
 	of_string_encoding_t encoding;
 
 	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
 		[super close];
 		@throw [OFConnectionFailedException
-		    exceptionWithHost: nil
-				 port: 0
+		    exceptionWithHost: host
+				 port: port
 			       socket: self];
+	}
+
+	if (_certificateVerificationEnabled) {
+		X509_VERIFY_PARAM *param = SSL_get0_param(_SSL);
+
+		X509_VERIFY_PARAM_set_hostflags(param,
+		    X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+
+		if (X509_VERIFY_PARAM_set1_host(param,
+		    [host UTF8String], [host UTF8StringLength]) == 0)
+			@throw [OFConnectionFailedException
+			    exceptionWithHost: host
+					 port: port
+				       socket: self];
+
+		SSL_set_verify(_SSL, SSL_VERIFY_PEER, NULL);
 	}
 
 	SSL_set_connect_state(_SSL);
@@ -162,10 +204,16 @@ locking_callback(int mode, int n, const char *file, int line)
 	    SSL_FILETYPE_PEM)) || SSL_connect(_SSL) != 1) {
 		[super close];
 		@throw [OFConnectionFailedException
-		    exceptionWithHost: nil
-				 port: 0
+		    exceptionWithHost: host
+				 port: port
 			       socket: self];
 	}
+}
+
+- (void)startTLSWithExpectedHost: (OFString*)host
+{
+	[self SSL_startTLSWithExpectedHost: host
+				      port: 0];
 }
 
 - (void)connectToHost: (OFString*)host
@@ -174,7 +222,8 @@ locking_callback(int mode, int n, const char *file, int line)
 	[super connectToHost: host
 			port: port];
 
-	[self startTLS];
+	[self SSL_startTLSWithExpectedHost: host
+				      port: port];
 }
 
 - (instancetype)accept
@@ -190,7 +239,7 @@ locking_callback(int mode, int n, const char *file, int line)
 							      errNo: 0];
 	}
 
-	if (_requestsClientCertificates)
+	if (_requestClientCertificatesEnabled)
 		SSL_set_verify(client->_SSL, SSL_VERIFY_PEER, NULL);
 
 	SSL_set_accept_state(client->_SSL);
@@ -283,15 +332,14 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)setDelegate: (id <OFTLSSocketDelegate>)delegate
 {
-	/* FIXME */
-	[self doesNotRecognizeSelector: _cmd];
-	abort();
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
 - (id <OFTLSSocketDelegate>)delegate
 {
-	/* FIXME */
-	return nil;
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
 - (void)setCertificateFile: (OFString*)certificateFile
@@ -299,9 +347,22 @@ locking_callback(int mode, int n, const char *file, int line)
 	OF_SETTER(_certificateFile, certificateFile, true, 1)
 }
 
+- (void)setCertificateFile: (OFString*)certificateFile
+		forSNIHost: (OFString*)SNIHost
+{
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
+}
+
 - (OFString*)certificateFile
 {
 	OF_GETTER(_certificateFile, true)
+}
+
+- (OFString*)certificateFileForSNIHost: (OFString*)SNIHost
+{
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
 - (void)setPrivateKeyFile: (OFString*)privateKeyFile
@@ -309,30 +370,67 @@ locking_callback(int mode, int n, const char *file, int line)
 	OF_SETTER(_privateKeyFile, privateKeyFile, true, 1)
 }
 
+- (void)setPrivateKeyFile: (OFString*)privateKeyFile
+	       forSNIHost: (OFString*)SNIHost
+{
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
+}
+
 - (OFString*)privateKeyFile
 {
 	OF_GETTER(_privateKeyFile, true)
 }
 
+- (OFString*)privateKeyFileForSNIHost: (OFString*)SNIHost
+{
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
+}
+
 - (void)setPrivateKeyPassphrase: (const char*)privateKeyPassphrase
 {
-	/* FIXME */
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
+}
+
+- (void)setPrivateKeyPassphrase: (const char*)privateKeyPassphrase
+		     forSNIHost: (OFString*)SNIHost
+{
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
 - (const char*)privateKeyPassphrase
 {
-	/* FIXME */
-	return NULL;
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (void)setRequestsClientCertificates: (bool)enabled
+- (const char*)privateKeyPassphraseForSNIHost: (OFString*)SNIHost
 {
-	_requestsClientCertificates = enabled;
+	/* TODO */
+	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (bool)requestsClientCertificates
+- (void)setCertificateVerificationEnabled: (bool)enabled
 {
-	return _requestsClientCertificates;
+	_certificateVerificationEnabled = enabled;
+}
+
+- (bool)isCertificateVerificationEnabled
+{
+	return _certificateVerificationEnabled;
+}
+
+- (void)setRequestClientCertificatesEnabled: (bool)enabled
+{
+	_requestClientCertificatesEnabled = enabled;
+}
+
+- (bool)isRequestClientCertificatesEnabled
+{
+	return _requestClientCertificatesEnabled;
 }
 
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type

@@ -36,21 +36,15 @@ AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
 	AC_SUBST(OBJOPENSSL_STATIC_LIB, "libobjopenssl.a")
 ])
 
-AC_CHECK_LIB(ssl, main, [LIBS="$LIBS -lssl"], [
-	AC_MSG_ERROR(No libssl found! Please install OpenSSL!)
-])
-AC_CHECK_LIB(crypto, main, [LIBS="$LIBS -lcrypto"], [
-	AC_MSG_ERROR(No libcrypto found! Please install OpenSSL!)
-])
-AC_CHECK_LIB(z, main, [LIBS="$LIBS -lz"], [
-	AC_MSG_ERROR(No libz found! Please install zlib!)
+PKG_CHECK_MODULES(openssl, [openssl >= 1.0.2], [
+	CPPFLAGS="$CPPFLAGS $openssl_CFLAGS"
+	LIBS="$LIBS $openssl_LIBS"
+], [
+	AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
 ])
 
 AS_IF([test x"$GOBJC" = x"yes"], [
-	OBJCFLAGS="$OBJCFLAGS -Wwrite-strings -Wpointer-arith"
-	dnl We need -Wno-deprecated-declarations as OpenSSL is deprecated on
-	dnl OS X.
-	OBJCFLAGS="$OBJCFLAGS -Wno-deprecated-declarations"
+	OBJCFLAGS="$OBJCFLAGS -Wwrite-strings -Wpointer-arith -Werror"
 ])
 
 BUILDSYS_INIT
