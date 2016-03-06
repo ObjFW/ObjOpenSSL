@@ -57,10 +57,6 @@
 	OFDictionary *_subjectAlternativeName;
 }
 
-#ifdef OF_HAVE_PROPERTIES
-@property (readonly) OFDictionary *issuer, *subject, *subjectAlternativeName;
-#endif
-
 - initWithFile: (OFString*)file;
 - initWithX509Struct: (X509*)cert;
 - (OFDictionary*)issuer;

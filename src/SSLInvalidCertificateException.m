@@ -28,6 +28,8 @@
 #import <ObjFW/macros.h>
 
 @implementation SSLInvalidCertificateException
+@synthesize reason = _reason;
+
 + exceptionWithReason: (OFString*)reason
 {
 	return [[[self alloc] initWithReason: reason] autorelease];
@@ -70,10 +72,5 @@
 {
 	return [OFString stringWithFormat:
 	    @"Invalid certificate! Reason: %@", _reason];
-}
-
-- (OFString*)reason
-{
-	OF_GETTER(_reason, true)
 }
 @end

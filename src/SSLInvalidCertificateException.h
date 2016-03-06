@@ -29,11 +29,8 @@
 	OFString *_reason;
 }
 
-#ifdef OF_HAVE_PROPERTIES
 @property (readonly, copy) OFString *reason;
-#endif
 
 + exceptionWithReason: (OFString*)reason;
 - initWithReason: (OFString*)reason;
-- (OFString*)reason;
 @end

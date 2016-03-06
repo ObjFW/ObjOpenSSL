@@ -37,15 +37,11 @@
 	bool _requestClientCertificatesEnabled;
 }
 
-#ifdef OF_HAVE_PROPERTIES
 @property (getter=isRequestClientCertificatesEnabled)
     bool requestClientCertificatesEnabled;
-#endif
 
 - initWithSocket: (OFTCPSocket*)socket;
 - (void)SSL_super_close;
-- (void)setRequestClientCertificatesEnabled: (bool)enabled;
-- (bool)isRequestClientCertificatesEnabled;
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type;
 - (X509Certificate*)peerCertificate;
 - (void)verifyPeerCertificate;

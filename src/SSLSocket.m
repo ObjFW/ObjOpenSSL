@@ -89,6 +89,13 @@ locking_callback(int mode, int n, const char *file, int line)
 }
 
 @implementation SSLSocket
+@synthesize delegate = _delegate, certificateFile = _certificateFile;
+@synthesize privateKeyFile = _privateKeyFile;
+@synthesize privateKeyPassphrase = privateKeyPassphrase;
+@synthesize certificateVerificationEnabled = _certificateVerificationEnabled;
+@synthesize requestClientCertificatesEnabled =
+    _requestClientCertificatesEnabled;
+
 + (void)load
 {
 	of_tls_socket_class = self;
@@ -330,33 +337,11 @@ locking_callback(int mode, int n, const char *file, int line)
 	return [super hasDataInReadBuffer];
 }
 
-- (void)setDelegate: (id <OFTLSSocketDelegate>)delegate
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (id <OFTLSSocketDelegate>)delegate
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (void)setCertificateFile: (OFString*)certificateFile
-{
-	OF_SETTER(_certificateFile, certificateFile, true, 1)
-}
-
 - (void)setCertificateFile: (OFString*)certificateFile
 		forSNIHost: (OFString*)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (OFString*)certificateFile
-{
-	OF_GETTER(_certificateFile, true)
 }
 
 - (OFString*)certificateFileForSNIHost: (OFString*)SNIHost
@@ -366,29 +351,13 @@ locking_callback(int mode, int n, const char *file, int line)
 }
 
 - (void)setPrivateKeyFile: (OFString*)privateKeyFile
-{
-	OF_SETTER(_privateKeyFile, privateKeyFile, true, 1)
-}
-
-- (void)setPrivateKeyFile: (OFString*)privateKeyFile
 	       forSNIHost: (OFString*)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (OFString*)privateKeyFile
-{
-	OF_GETTER(_privateKeyFile, true)
-}
-
 - (OFString*)privateKeyFileForSNIHost: (OFString*)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (void)setPrivateKeyPassphrase: (const char*)privateKeyPassphrase
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
@@ -401,36 +370,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (const char*)privateKeyPassphrase
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
 - (const char*)privateKeyPassphraseForSNIHost: (OFString*)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (void)setCertificateVerificationEnabled: (bool)enabled
-{
-	_certificateVerificationEnabled = enabled;
-}
-
-- (bool)isCertificateVerificationEnabled
-{
-	return _certificateVerificationEnabled;
-}
-
-- (void)setRequestClientCertificatesEnabled: (bool)enabled
-{
-	_requestClientCertificatesEnabled = enabled;
-}
-
-- (bool)isRequestClientCertificatesEnabled
-{
-	return _requestClientCertificatesEnabled;
 }
 
 - (OFDataArray*)channelBindingDataWithType: (OFString*)type
