@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2011, 2012, 2013, 2014, 2015
- *     Jonathan Schleifer <js@webkeks.org>
+ * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016
+ *     Jonathan Schleifer <js@heap.zone>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
- * https://webkeks.org/git/?p=objopenssl.git
+ * https://heap.zone/git/?p=objopenssl.git
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

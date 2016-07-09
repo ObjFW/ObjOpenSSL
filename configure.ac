@@ -1,4 +1,4 @@
-AC_INIT(ObjOpenSSL, 0.1, js@webkeks.org)
+AC_INIT(ObjOpenSSL, 0.1, js@heap.zone)
 AC_CONFIG_SRCDIR(src)
 
 AC_CHECK_TOOL(OBJFW_CONFIG, objfw-config)
