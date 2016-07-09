@@ -15,6 +15,8 @@
 		4B9671B6193E55C800F9F80D /* ObjFW.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9671B5193E55C800F9F80D /* ObjFW.framework */; };
 		4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD0AAEA1341289500445289 /* SSLSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BD0AAED1341289500445289 /* SSLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BD0AAEB1341289500445289 /* SSLSocket.m */; };
+		4BDE04741D319BFC0051EDB8 /* SSLConnectionFailedException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BDE04721D319BFC0051EDB8 /* SSLConnectionFailedException.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BDE04751D319BFC0051EDB8 /* SSLConnectionFailedException.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BDE04731D319BFC0051EDB8 /* SSLConnectionFailedException.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		4BD0AAE91341286B00445289 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		4BD0AAEA1341289500445289 /* SSLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLSocket.h; path = src/SSLSocket.h; sourceTree = SOURCE_ROOT; };
 		4BD0AAEB1341289500445289 /* SSLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SSLSocket.m; path = src/SSLSocket.m; sourceTree = SOURCE_ROOT; };
+		4BDE04721D319BFC0051EDB8 /* SSLConnectionFailedException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSLConnectionFailedException.h; path = src/SSLConnectionFailedException.h; sourceTree = SOURCE_ROOT; };
+		4BDE04731D319BFC0051EDB8 /* SSLConnectionFailedException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SSLConnectionFailedException.m; path = src/SSLConnectionFailedException.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +76,8 @@
 			children = (
 				4B1918F41341272300D82152 /* Supporting Files */,
 				4B4F087713A01EEF00B60C3F /* ObjOpenSSL.h */,
+				4BDE04721D319BFC0051EDB8 /* SSLConnectionFailedException.h */,
+				4BDE04731D319BFC0051EDB8 /* SSLConnectionFailedException.m */,
 				4B19F58714D17250005D52DC /* SSLInvalidCertificateException.h */,
 				4B19F58814D17250005D52DC /* SSLInvalidCertificateException.m */,
 				4BD0AAEA1341289500445289 /* SSLSocket.h */,
@@ -98,6 +104,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B4F087813A01EEF00B60C3F /* ObjOpenSSL.h in Headers */,
+				4BDE04741D319BFC0051EDB8 /* SSLConnectionFailedException.h in Headers */,
 				4B19F58B14D17250005D52DC /* SSLInvalidCertificateException.h in Headers */,
 				4BD0AAEC1341289500445289 /* SSLSocket.h in Headers */,
 				4B19F58D14D17250005D52DC /* X509Certificate.h in Headers */,
@@ -131,7 +138,7 @@
 		4B1918E01341272300D82152 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0730;
 			};
 			buildConfigurationList = 4B1918E31341272300D82152 /* Build configuration list for PBXProject "ObjOpenSSL" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -165,6 +172,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BDE04751D319BFC0051EDB8 /* SSLConnectionFailedException.m in Sources */,
 				4B19F58C14D17250005D52DC /* SSLInvalidCertificateException.m in Sources */,
 				4BD0AAED1341289500445289 /* SSLSocket.m in Sources */,
 				4B19F58E14D17250005D52DC /* X509Certificate.m in Sources */,
@@ -177,6 +185,7 @@
 		4B1918FA1341272300D82152 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -224,6 +233,7 @@
 					"-lcrypto",
 					"-lz",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "zone.heap.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -263,6 +273,7 @@
 					"-lcrypto",
 					"-lz",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "zone.heap.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
 					"-Wall",

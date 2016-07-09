@@ -5,7 +5,8 @@ STATIC_LIB = ${OBJOPENSSL_STATIC_LIB}
 LIB_MAJOR = 0
 LIB_MINOR = 0
 
-SRCS = SSLInvalidCertificateException.m	\
+SRCS = SSLConnectionFailedException.m	\
+       SSLInvalidCertificateException.m	\
        SSLSocket.m			\
        X509Certificate.m
 

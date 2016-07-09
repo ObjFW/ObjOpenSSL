@@ -34,6 +34,7 @@
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <openssl/x509v3.h>
 
 #if defined(__clang__)
@@ -46,7 +47,6 @@
 #import <ObjFW/OFSystemInfo.h>
 
 #import <ObjFW/OFAcceptFailedException.h>
-#import <ObjFW/OFConnectionFailedException.h>
 #import <ObjFW/OFInitializationFailedException.h>
 #import <ObjFW/OFInvalidArgumentException.h>
 #import <ObjFW/OFNotOpenException.h>
@@ -58,8 +58,10 @@
 #import <ObjFW/threading.h>
 
 #import "SSLSocket.h"
-#import "SSLInvalidCertificateException.h"
 #import "X509Certificate.h"
+
+#import "SSLConnectionFailedException.h"
+#import "SSLInvalidCertificateException.h"
 
 #ifndef INVALID_SOCKET
 # define INVALID_SOCKET -1
@@ -175,12 +177,16 @@ locking_callback(int mode, int n, const char *file, int line)
 {
 	of_string_encoding_t encoding;
 
-	if ((_SSL = SSL_new(ctx)) == NULL || !SSL_set_fd(_SSL, _socket)) {
+	if ((_SSL = SSL_new(ctx)) == NULL || SSL_set_fd(_SSL, _socket) != 1) {
+		unsigned long error = ERR_get_error();
+
 		[super close];
-		@throw [OFConnectionFailedException
+
+		@throw [SSLConnectionFailedException
 		    exceptionWithHost: host
 				 port: port
-			       socket: self];
+			       socket: self
+			     SSLError: error];
 	}
 
 	if (_certificateVerificationEnabled) {
@@ -190,11 +196,17 @@ locking_callback(int mode, int n, const char *file, int line)
 		    X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
 
 		if (X509_VERIFY_PARAM_set1_host(param,
-		    [host UTF8String], [host UTF8StringLength]) == 0)
-			@throw [OFConnectionFailedException
+		    [host UTF8String], [host UTF8StringLength]) != 1) {
+			unsigned long error = ERR_get_error();
+
+			[self close];
+
+			@throw [SSLConnectionFailedException
 			    exceptionWithHost: host
 					 port: port
-				       socket: self];
+				       socket: self
+				     SSLError: error];
+		}
 
 		SSL_set_verify(_SSL, SSL_VERIFY_PEER, NULL);
 	}
@@ -208,12 +220,37 @@ locking_callback(int mode, int n, const char *file, int line)
 	    SSL_FILETYPE_PEM)) || (_certificateFile != nil &&
 	    !SSL_use_certificate_file(_SSL, [_certificateFile
 	    cStringWithEncoding: encoding],
-	    SSL_FILETYPE_PEM)) || SSL_connect(_SSL) != 1) {
+	    SSL_FILETYPE_PEM))) {
+		unsigned long error = ERR_get_error();
+
 		[super close];
-		@throw [OFConnectionFailedException
+
+		@throw [SSLConnectionFailedException
 		    exceptionWithHost: host
 				 port: port
-			       socket: self];
+			       socket: self
+			     SSLError: error];
+	}
+
+	if (SSL_connect(_SSL) != 1) {
+		unsigned long error = ERR_get_error();
+		long res;
+
+		[super close];
+
+		if ((res = SSL_get_verify_result(_SSL)) != X509_V_OK)
+			@throw [SSLConnectionFailedException
+			    exceptionWithHost: host
+					 port: port
+				       socket: self
+				     SSLError: error
+				 verifyResult: res];
+		else
+			@throw [SSLConnectionFailedException
+			    exceptionWithHost: host
+					 port: port
+				       socket: self
+				     SSLError: error];
 	}
 }
 
