@@ -70,6 +70,10 @@
 static SSL_CTX *ctx;
 static of_mutex_t *ssl_mutexes;
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunused-function"
+#endif
 static unsigned long
 get_thread_id(void)
 {
@@ -89,6 +93,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	else
 		of_mutex_unlock(&ssl_mutexes[n]);
 }
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 
 @implementation SSLSocket
 @synthesize delegate = _delegate, certificateFile = _certificateFile;
@@ -126,7 +133,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		@throw [OFInitializationFailedException
 		    exceptionWithClass: self];
 
-	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) == 0)
+	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) != SSL_OP_NO_SSLv2)
 		@throw [OFInitializationFailedException
 		    exceptionWithClass: self];
 
