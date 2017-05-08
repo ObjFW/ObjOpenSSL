@@ -42,9 +42,9 @@
 @implementation SSLConnectionFailedException
 @synthesize SSLError = _SSLError, verifyResult = _verifyResult;
 
-+ (instancetype)exceptionWithHost: (OFString*)host
++ (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
-			   socket: (SSLSocket*)socket
+			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError
 {
 	return [[[self alloc] initWithHost: host
@@ -54,9 +54,9 @@
 }
 
 
-+ (instancetype)exceptionWithHost: (OFString*)host
++ (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
-			   socket: (SSLSocket*)socket
+			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError
 		     verifyResult: (long)verifyResult
 {
@@ -67,9 +67,9 @@
 			      verifyResult: verifyResult] autorelease];
 }
 
-- initWithHost: (OFString*)host
+- initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket*)socket
+	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError
 {
 	self = [super initWithHost: host
@@ -81,9 +81,9 @@
 	return self;
 }
 
-- initWithHost: (OFString*)host
+- initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket*)socket
+	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError
   verifyResult: (long)verifyResult
 {
@@ -97,7 +97,7 @@
 	return self;
 }
 
-- (OFString*)description
+- (OFString *)description
 {
 	if (_SSLError != SSL_ERROR_NONE) {
 		char error[512];

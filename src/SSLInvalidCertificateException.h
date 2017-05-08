@@ -29,8 +29,8 @@
 	OFString *_reason;
 }
 
-@property (readonly, copy) OFString *reason;
+@property (readonly, nonatomic) OFString *reason;
 
-+ exceptionWithReason: (OFString*)reason;
-- initWithReason: (OFString*)reason;
++ exceptionWithReason: (OFString *)reason;
+- initWithReason: (OFString *)reason;
 @end

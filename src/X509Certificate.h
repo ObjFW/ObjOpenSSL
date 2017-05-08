@@ -46,7 +46,7 @@
 	OFString *_string;
 }
 
-- initWithUTF8String: (const char*)string;
+- initWithUTF8String: (const char *)string;
 @end
 
 @interface X509Certificate: OFObject
@@ -57,18 +57,18 @@
 	OFDictionary *_subjectAlternativeName;
 }
 
-- initWithFile: (OFString*)file;
-- initWithX509Struct: (X509*)cert;
-- (OFDictionary*)issuer;
-- (OFDictionary*)subject;
-- (OFDictionary*)subjectAlternativeName;
-- (bool)hasCommonNameMatchingDomain: (OFString*)domain;
-- (bool)hasDNSNameMatchingDomain: (OFString*)domain;
-- (bool)hasSRVNameMatchingDomain: (OFString*)domain
-			 service: (OFString*)service;
-- (bool)X509_isAssertedDomain: (OFString*)asserted
-		  equalDomain: (OFString*)domain;
-- (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name;
-- (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)obj;
-- (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str;
+- initWithFile: (OFString *)file;
+- initWithX509Struct: (X509 *)cert;
+- (OFDictionary *)issuer;
+- (OFDictionary *)subject;
+- (OFDictionary *)subjectAlternativeName;
+- (bool)hasCommonNameMatchingDomain: (OFString *)domain;
+- (bool)hasDNSNameMatchingDomain: (OFString *)domain;
+- (bool)hasSRVNameMatchingDomain: (OFString *)domain
+			 service: (OFString *)service;
+- (bool)X509_isAssertedDomain: (OFString *)asserted
+		  equalDomain: (OFString *)domain;
+- (OFDictionary *)X509_dictionaryFromX509Name: (X509_NAME *)name;
+- (X509OID *)X509_stringFromASN1Object: (ASN1_OBJECT *)obj;
+- (OFString *)X509_stringFromASN1String: (ASN1_STRING *)str;
 @end

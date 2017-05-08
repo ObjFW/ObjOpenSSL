@@ -33,22 +33,22 @@
 @property (readonly) unsigned long SSLError;
 @property (readonly) long verifyResult;
 
-+ (instancetype)exceptionWithHost: (OFString*)host
++ (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
-			   socket: (SSLSocket*)socket
+			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError;
-+ (instancetype)exceptionWithHost: (OFString*)host
++ (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
-			   socket: (SSLSocket*)socket
+			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError
 		     verifyResult: (long)verifyResult;
-- initWithHost: (OFString*)host
+- initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket*)socket
+	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError;
-- initWithHost: (OFString*)host
+- initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket*)socket
+	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError
   verifyResult: (long)verifyResult;
 @end

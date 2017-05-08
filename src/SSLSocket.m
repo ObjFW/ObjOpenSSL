@@ -144,7 +144,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	return self;
 }
 
-- initWithSocket: (OFTCPSocket*)socket
+- initWithSocket: (OFTCPSocket *)socket
 {
 	self = [self init];
 
@@ -172,7 +172,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		SSL_free(SSL_);
 }
 
-- (void)SSL_startTLSWithExpectedHost: (OFString*)host
+- (void)SSL_startTLSWithExpectedHost: (OFString *)host
 				port: (uint16_t)port
 {
 	of_string_encoding_t encoding;
@@ -254,13 +254,13 @@ locking_callback(int mode, int n, const char *file, int line)
 	}
 }
 
-- (void)startTLSWithExpectedHost: (OFString*)host
+- (void)startTLSWithExpectedHost: (OFString *)host
 {
 	[self SSL_startTLSWithExpectedHost: host
 				      port: 0];
 }
 
-- (void)connectToHost: (OFString*)host
+- (void)connectToHost: (OFString *)host
 		 port: (uint16_t)port
 {
 	[super connectToHost: host
@@ -272,7 +272,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (instancetype)accept
 {
-	SSLSocket *client = (SSLSocket*)[super accept];
+	SSLSocket *client = (SSLSocket *)[super accept];
 	of_string_encoding_t encoding;
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
@@ -317,7 +317,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	[super close];
 }
 
-- (size_t)lowlevelReadIntoBuffer: (void*)buffer
+- (size_t)lowlevelReadIntoBuffer: (void *)buffer
 			  length: (size_t)length
 {
 	ssize_t ret;
@@ -347,7 +347,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	return ret;
 }
 
-- (void)lowlevelWriteBuffer: (const void*)buffer
+- (void)lowlevelWriteBuffer: (const void *)buffer
 		     length: (size_t)length
 {
 	if (length > INT_MAX)
@@ -374,46 +374,46 @@ locking_callback(int mode, int n, const char *file, int line)
 	return [super hasDataInReadBuffer];
 }
 
-- (void)setCertificateFile: (OFString*)certificateFile
-		forSNIHost: (OFString*)SNIHost
+- (void)setCertificateFile: (OFString *)certificateFile
+		forSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (OFString*)certificateFileForSNIHost: (OFString*)SNIHost
+- (OFString *)certificateFileForSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (void)setPrivateKeyFile: (OFString*)privateKeyFile
-	       forSNIHost: (OFString*)SNIHost
+- (void)setPrivateKeyFile: (OFString *)privateKeyFile
+	       forSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (OFString*)privateKeyFileForSNIHost: (OFString*)SNIHost
+- (OFString *)privateKeyFileForSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (void)setPrivateKeyPassphrase: (const char*)privateKeyPassphrase
-		     forSNIHost: (OFString*)SNIHost
+- (void)setPrivateKeyPassphrase: (const char *)privateKeyPassphrase
+		     forSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (const char*)privateKeyPassphraseForSNIHost: (OFString*)SNIHost
+- (const char *)privateKeyPassphraseForSNIHost: (OFString *)SNIHost
 {
 	/* TODO */
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (OFDataArray*)channelBindingDataWithType: (OFString*)type
+- (OFDataArray *)channelBindingDataWithType: (OFString *)type
 {
 	size_t length;
 	char buffer[64];
@@ -440,7 +440,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	return data;
 }
 
-- (X509Certificate*)peerCertificate
+- (X509Certificate *)peerCertificate
 {
 	X509 *certificate = SSL_get_peer_certificate(_SSL);
 

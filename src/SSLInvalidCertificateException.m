@@ -30,7 +30,7 @@
 @implementation SSLInvalidCertificateException
 @synthesize reason = _reason;
 
-+ exceptionWithReason: (OFString*)reason
++ exceptionWithReason: (OFString *)reason
 {
 	return [[[self alloc] initWithReason: reason] autorelease];
 }
@@ -47,7 +47,7 @@
 	abort();
 }
 
-- initWithReason: (OFString*)reason
+- initWithReason: (OFString *)reason
 {
 	self = [super init];
 
@@ -68,7 +68,7 @@
 	[super dealloc];
 }
 
-- (OFString*)description
+- (OFString *)description
 {
 	return [OFString stringWithFormat:
 	    @"Invalid certificate! Reason: %@", _reason];

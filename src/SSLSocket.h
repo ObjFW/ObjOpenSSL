@@ -40,9 +40,9 @@
 @property (getter=isRequestClientCertificatesEnabled)
     bool requestClientCertificatesEnabled;
 
-- initWithSocket: (OFTCPSocket*)socket;
+- initWithSocket: (OFTCPSocket *)socket;
 - (void)SSL_super_close;
-- (OFDataArray*)channelBindingDataWithType: (OFString*)type;
-- (X509Certificate*)peerCertificate;
+- (OFDataArray *)channelBindingDataWithType: (OFString *)type;
+- (X509Certificate *)peerCertificate;
 - (void)verifyPeerCertificate;
 @end

@@ -49,7 +49,7 @@
 #import <ObjFW/macros.h>
 
 @implementation X509Certificate
-- initWithFile: (OFString*)path
+- initWithFile: (OFString *)path
 {
 	self = [self init];
 
@@ -73,7 +73,7 @@
 	return self;
 }
 
-- initWithX509Struct: (X509*)certificate
+- initWithX509Struct: (X509 *)certificate
 {
 	self = [self init];
 
@@ -102,7 +102,7 @@
 	[super dealloc];
 }
 
-- (OFString*)description
+- (OFString *)description
 {
 	OFMutableString *ret = [OFMutableString string];
 
@@ -114,7 +114,7 @@
 	return ret;
 }
 
-- (OFDictionary*)issuer
+- (OFDictionary *)issuer
 {
 	X509_NAME *name;
 
@@ -127,7 +127,7 @@
 	return _issuer;
 }
 
-- (OFDictionary*)subject
+- (OFDictionary *)subject
 {
 	X509_NAME *name;
 
@@ -140,7 +140,7 @@
 	return _subject;
 }
 
-- (OFDictionary*)subjectAlternativeName
+- (OFDictionary *)subjectAlternativeName
 {
 	OFAutoreleasePool *pool;
 	OFMutableDictionary *ret;
@@ -263,7 +263,7 @@
 	return ret;
 }
 
-- (bool)hasCommonNameMatchingDomain: (OFString*)domain
+- (bool)hasCommonNameMatchingDomain: (OFString *)domain
 {
 	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -282,7 +282,7 @@
 	return false;
 }
 
-- (bool)hasDNSNameMatchingDomain: (OFString*)domain
+- (bool)hasDNSNameMatchingDomain: (OFString *)domain
 {
 	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -302,8 +302,8 @@
 	return false;
 }
 
-- (bool)hasSRVNameMatchingDomain: (OFString*)domain
-			 service: (OFString*)service
+- (bool)hasSRVNameMatchingDomain: (OFString *)domain
+			 service: (OFString *)service
 {
 	size_t serviceLength;
 	OFString *name;
@@ -336,8 +336,8 @@
 	return false;
 }
 
-- (bool)X509_isAssertedDomain: (OFString*)asserted
-		  equalDomain: (OFString*)domain
+- (bool)X509_isAssertedDomain: (OFString *)asserted
+		  equalDomain: (OFString *)domain
 {
 	/*
 	 * In accordance with RFC 6125 this only allows a wildcard as the
@@ -370,7 +370,7 @@
 	return false;
 }
 
-- (OFDictionary*)X509_dictionaryFromX509Name: (X509_NAME*)name
+- (OFDictionary *)X509_dictionaryFromX509Name: (X509_NAME *)name
 {
 	OFMutableDictionary *dict = [OFMutableDictionary dictionary];
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -401,7 +401,7 @@
 }
 
 
-- (X509OID*)X509_stringFromASN1Object: (ASN1_OBJECT*)object
+- (X509OID *)X509_stringFromASN1Object: (ASN1_OBJECT *)object
 {
 	X509OID *ret;
 	int length, bufferLength = 256;
@@ -424,12 +424,12 @@
 	return ret;
 }
 
-- (OFString*)X509_stringFromASN1String: (ASN1_STRING*)str
+- (OFString *)X509_stringFromASN1String: (ASN1_STRING *)str
 {
 	OFString *ret;
 	char *buffer;
 
-	if (ASN1_STRING_to_UTF8((unsigned char**)&buffer, str) < 0)
+	if (ASN1_STRING_to_UTF8((unsigned char **)&buffer, str) < 0)
 		@throw [OFInvalidEncodingException exception];
 
 	@try {
@@ -443,7 +443,7 @@
 @end
 
 @implementation X509OID
-- initWithUTF8String: (const char*)string
+- initWithUTF8String: (const char *)string
 {
 	self = [self init];
 
@@ -463,7 +463,7 @@
 	[super dealloc];
 }
 
-- (OFString*)description
+- (OFString *)description
 {
 	char tmp[1024];
 	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj([_string UTF8String], 1), 0);
