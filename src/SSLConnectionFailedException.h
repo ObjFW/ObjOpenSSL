@@ -22,6 +22,8 @@
 
 #import <ObjFW/OFConnectionFailedException.h>
 
+OF_ASSUME_NONNULL_BEGIN
+
 @class SSLSocket;
 
 @interface SSLConnectionFailedException: OFConnectionFailedException
@@ -30,9 +32,16 @@
 	long _verifyResult;
 }
 
-@property (readonly) unsigned long SSLError;
-@property (readonly) long verifyResult;
+@property (readonly, nonatomic) unsigned long SSLError;
+@property (readonly, nonatomic) long verifyResult;
 
++ (instancetype)exceptionWithHost: (OFString *)host
+			     port: (uint16_t)port
+			   socket: (id)socket OF_UNAVAILABLE;
++ (instancetype)exceptionWithHost: (OFString *)host
+			     port: (uint16_t)port
+			   socket: (id)socket
+			    errNo: (int)errNo OF_UNAVAILABLE;
 + (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
 			   socket: (SSLSocket *)socket
@@ -44,11 +53,20 @@
 		     verifyResult: (long)verifyResult;
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port
+	socket: (SSLSocket *)socket OF_UNAVAILABLE;
+- initWithHost: (OFString *)host
+	  port: (uint16_t)port
+	socket: (SSLSocket *)socket
+	 errNo: (int)errNo OF_UNAVAILABLE;
+- initWithHost: (OFString *)host
+	  port: (uint16_t)port
 	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError;
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port
 	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError
-  verifyResult: (long)verifyResult;
+  verifyResult: (long)verifyResult OF_DESIGNATED_INITIALIZER;
 @end
+
+OF_ASSUME_NONNULL_END

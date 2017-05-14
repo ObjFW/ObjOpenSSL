@@ -48,10 +48,27 @@
 
 #import <ObjFW/macros.h>
 
+OF_ASSUME_NONNULL_BEGIN
+
+@interface X509Certificate ()
+- (bool)X509_isAssertedDomain: (OFString *)asserted
+		  equalDomain: (OFString *)domain;
+- (OFDictionary *)X509_dictionaryFromX509Name: (X509_NAME *)name;
+- (X509OID *)X509_stringFromASN1Object: (ASN1_OBJECT *)obj;
+- (OFString *)X509_stringFromASN1String: (ASN1_STRING *)str;
+@end
+
+OF_ASSUME_NONNULL_END
+
 @implementation X509Certificate
+- init
+{
+	OF_INVALID_INIT_METHOD
+}
+
 - initWithFile: (OFString *)path
 {
-	self = [self init];
+	self = [super init];
 
 	@try {
 		OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
@@ -75,7 +92,7 @@
 
 - initWithX509Struct: (X509 *)certificate
 {
-	self = [self init];
+	self = [super init];
 
 	@try {
 		_certificate = X509_dup(certificate);
@@ -265,12 +282,9 @@
 
 - (bool)hasCommonNameMatchingDomain: (OFString *)domain
 {
-	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-	OFList *CNs = [[self subject] objectForKey: OID_commonName];
-	OFEnumerator *enumerator = [CNs objectEnumerator];
 
-	while ((name = [enumerator nextObject]) != nil) {
+	for (OFString *name in [[self subject] objectForKey: OID_commonName]) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
@@ -284,13 +298,10 @@
 
 - (bool)hasDNSNameMatchingDomain: (OFString *)domain
 {
-	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-	OFDictionary *SANs = [self subjectAlternativeName];
-	OFList *assertedNames = [SANs objectForKey: @"dNSName"];
-	OFEnumerator *enumerator = [assertedNames objectEnumerator];
 
-	while ((name = [enumerator nextObject]) != nil) {
+	for (OFString *name in
+	    [[self subjectAlternativeName] objectForKey: @"dNSName"]) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
 			[pool release];
@@ -306,12 +317,10 @@
 			 service: (OFString *)service
 {
 	size_t serviceLength;
-	OFString *name;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	OFDictionary *SANs = [self subjectAlternativeName];
 	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
 				     objectForKey: OID_SRVName];
-	OFEnumerator *enumerator = [assertedNames objectEnumerator];
 
 	if (![service hasPrefix: @"_"])
 		service = [service stringByPrependingString: @"_"];
@@ -319,7 +328,7 @@
 	service = [service stringByAppendingString: @"."];
 	serviceLength = [service length];
 
-	while ((name = [enumerator nextObject]) != nil) {
+	for (OFString *name in assertedNames) {
 		if ([name hasPrefix: service]) {
 			OFString *asserted;
 			asserted = [name substringWithRange: of_range(
@@ -443,9 +452,14 @@
 @end
 
 @implementation X509OID
+- init
+{
+	OF_INVALID_INIT_METHOD
+}
+
 - initWithUTF8String: (const char *)string
 {
-	self = [self init];
+	self = [super init];
 
 	@try {
 		_string = [[OFString alloc] initWithUTF8String: string];

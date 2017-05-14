@@ -24,6 +24,8 @@
 #import <ObjFW/OFString.h>
 #import <ObjFW/OFException.h>
 
+OF_ASSUME_NONNULL_BEGIN
+
 @interface SSLInvalidCertificateException: OFException
 {
 	OFString *_reason;
@@ -31,6 +33,10 @@
 
 @property (readonly, nonatomic) OFString *reason;
 
-+ exceptionWithReason: (OFString *)reason;
-- initWithReason: (OFString *)reason;
++ (instancetype)exception;
++ (instancetype)exceptionWithReason: (OFString *)reason;
+- init OF_UNAVAILABLE;
+- initWithReason: (OFString *)reason OF_DESIGNATED_INITIALIZER;
 @end
+
+OF_ASSUME_NONNULL_END

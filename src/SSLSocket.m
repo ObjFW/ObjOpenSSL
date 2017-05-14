@@ -90,6 +90,10 @@ locking_callback(int mode, int n, const char *file, int line)
 		of_mutex_unlock(&ssl_mutexes[n]);
 }
 
+@interface SSLSocket ()
+- (void)SSL_super_close;
+@end
+
 @implementation SSLSocket
 @synthesize delegate = _delegate, certificateFile = _certificateFile;
 @synthesize privateKeyFile = _privateKeyFile;
@@ -444,7 +448,7 @@ locking_callback(int mode, int n, const char *file, int line)
 {
 	X509 *certificate = SSL_get_peer_certificate(_SSL);
 
-	if (!certificate)
+	if (certificate == NULL)
 		return nil;
 
 	return [[[X509Certificate alloc]

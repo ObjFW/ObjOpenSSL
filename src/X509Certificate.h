@@ -26,7 +26,7 @@
 #import <ObjFW/OFObject.h>
 #import <ObjFW/OFString.h>
 
-@class OFDictionary;
+OF_ASSUME_NONNULL_BEGIN
 
 /* OIDs: */
 #define OID_commonName @"2.5.4.3"
@@ -41,12 +41,15 @@
 
 #define OID_SRVName @"1.3.6.1.5.5.7.8.7"
 
+@class OFDictionary;
+
 @interface X509OID: OFObject <OFCopying>
 {
 	OFString *_string;
 }
 
-- initWithUTF8String: (const char *)string;
+- init OF_UNAVAILABLE;
+- initWithUTF8String: (const char *)string OF_DESIGNATED_INITIALIZER;
 @end
 
 @interface X509Certificate: OFObject
@@ -57,18 +60,17 @@
 	OFDictionary *_subjectAlternativeName;
 }
 
+@property (readonly, nonatomic) OFDictionary *issuer;
+@property (readonly, nonatomic) OFDictionary *subject;
+@property (readonly, nonatomic) OFDictionary *subjectAlternateName;
+
+- init OF_UNAVAILABLE;
 - initWithFile: (OFString *)file;
 - initWithX509Struct: (X509 *)cert;
-- (OFDictionary *)issuer;
-- (OFDictionary *)subject;
-- (OFDictionary *)subjectAlternativeName;
 - (bool)hasCommonNameMatchingDomain: (OFString *)domain;
 - (bool)hasDNSNameMatchingDomain: (OFString *)domain;
 - (bool)hasSRVNameMatchingDomain: (OFString *)domain
 			 service: (OFString *)service;
-- (bool)X509_isAssertedDomain: (OFString *)asserted
-		  equalDomain: (OFString *)domain;
-- (OFDictionary *)X509_dictionaryFromX509Name: (X509_NAME *)name;
-- (X509OID *)X509_stringFromASN1Object: (ASN1_OBJECT *)obj;
-- (OFString *)X509_stringFromASN1String: (ASN1_STRING *)str;
 @end
+
+OF_ASSUME_NONNULL_END

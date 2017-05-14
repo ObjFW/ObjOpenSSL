@@ -26,6 +26,8 @@
 #import <ObjFW/OFTCPSocket.h>
 #import <ObjFW/OFTLSSocket.h>
 
+OF_ASSUME_NONNULL_BEGIN
+
 @class X509Certificate;
 
 @interface SSLSocket: OFTCPSocket <OFTLSSocket>
@@ -37,12 +39,14 @@
 	bool _requestClientCertificatesEnabled;
 }
 
-@property (getter=isRequestClientCertificatesEnabled)
+@property (nonatomic, getter=isRequestClientCertificatesEnabled)
     bool requestClientCertificatesEnabled;
+@property OF_NULLABLE_PROPERTY (readonly, nonatomic)
+    X509Certificate *peerCertificate;
 
 - initWithSocket: (OFTCPSocket *)socket;
-- (void)SSL_super_close;
 - (OFDataArray *)channelBindingDataWithType: (OFString *)type;
-- (X509Certificate *)peerCertificate;
-- (void)verifyPeerCertificate;
+- (nullable X509Certificate *)peerCertificate;
 @end
+
+OF_ASSUME_NONNULL_END

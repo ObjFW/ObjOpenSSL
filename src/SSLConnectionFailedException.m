@@ -44,6 +44,21 @@
 
 + (instancetype)exceptionWithHost: (OFString *)host
 			     port: (uint16_t)port
+			   socket: (id)socket
+{
+	OF_UNRECOGNIZED_SELECTOR
+}
+
++ (instancetype)exceptionWithHost: (OFString *)host
+			     port: (uint16_t)port
+			   socket: (id)socket
+			    errNo: (int)errNo
+{
+	OF_UNRECOGNIZED_SELECTOR
+}
+
++ (instancetype)exceptionWithHost: (OFString *)host
+			     port: (uint16_t)port
 			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError
 {
@@ -69,16 +84,29 @@
 
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port
+	socket: (id)socket
+{
+	OF_INVALID_INIT_METHOD
+}
+
+- initWithHost: (OFString *)host
+	  port: (uint16_t)port
+	socket: (id)socket
+	 errNo: (int)errNo
+{
+	OF_INVALID_INIT_METHOD
+}
+
+- initWithHost: (OFString *)host
+	  port: (uint16_t)port
 	socket: (SSLSocket *)socket
       SSLError: (unsigned long)SSLError
 {
-	self = [super initWithHost: host
-			      port: port
-			    socket: socket];
-
-	_SSLError = SSLError;
-
-	return self;
+	return [self initWithHost: host
+			     port: port
+			   socket: socket
+			 SSLError: SSLError
+		     verifyResult: 0];
 }
 
 - initWithHost: (OFString *)host

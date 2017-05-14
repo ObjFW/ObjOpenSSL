@@ -30,21 +30,19 @@
 @implementation SSLInvalidCertificateException
 @synthesize reason = _reason;
 
-+ exceptionWithReason: (OFString *)reason
++ (instancetype)exception
+{
+	OF_UNRECOGNIZED_SELECTOR
+}
+
++ (instancetype)exceptionWithReason: (OFString *)reason
 {
 	return [[[self alloc] initWithReason: reason] autorelease];
 }
 
 - init
 {
-	@try {
-		[self doesNotRecognizeSelector: _cmd];
-	} @catch (id e) {
-		[self release];
-		@throw e;
-	}
-
-	abort();
+	OF_INVALID_INIT_METHOD
 }
 
 - initWithReason: (OFString *)reason
