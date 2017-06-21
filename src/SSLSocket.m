@@ -342,7 +342,8 @@ locking_callback(int mode, int n, const char *file, int line)
 			return 0;
 
 		@throw [OFReadFailedException exceptionWithObject: self
-						  requestedLength: length];
+						  requestedLength: length
+							    errNo: 0];
 	}
 
 	if (ret == 0)
@@ -367,7 +368,8 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	if (SSL_write(_SSL, buffer, (int)length) < length)
 		@throw [OFWriteFailedException exceptionWithObject: self
-						   requestedLength: length];
+						   requestedLength: length
+							     errNo: 0];
 }
 
 - (bool)hasDataInReadBuffer

@@ -117,7 +117,8 @@
 {
 	self = [super initWithHost: host
 			      port: port
-			    socket: socket];
+			    socket: socket
+			     errNo: 0];
 
 	_SSLError = SSLError;
 	_verifyResult = verifyResult;
