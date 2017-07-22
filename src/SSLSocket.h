@@ -47,6 +47,7 @@ OF_ASSUME_NONNULL_BEGIN
 - initWithSocket: (OFTCPSocket *)socket;
 - (OFData *)channelBindingDataWithType: (OFString *)type;
 - (nullable X509Certificate *)peerCertificate;
+- (void)verifyPeerCertificate;
 @end
 
 OF_ASSUME_NONNULL_END
