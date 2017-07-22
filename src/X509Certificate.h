@@ -62,7 +62,7 @@ OF_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nonatomic) OFDictionary *issuer;
 @property (readonly, nonatomic) OFDictionary *subject;
-@property (readonly, nonatomic) OFDictionary *subjectAlternateName;
+@property (readonly, nonatomic) OFDictionary *subjectAlternativeName;
 
 - init OF_UNAVAILABLE;
 - initWithFile: (OFString *)file;
