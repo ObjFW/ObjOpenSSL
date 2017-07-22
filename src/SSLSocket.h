@@ -45,7 +45,7 @@ OF_ASSUME_NONNULL_BEGIN
     X509Certificate *peerCertificate;
 
 - initWithSocket: (OFTCPSocket *)socket;
-- (OFDataArray *)channelBindingDataWithType: (OFString *)type;
+- (OFData *)channelBindingDataWithType: (OFString *)type;
 - (nullable X509Certificate *)peerCertificate;
 @end
 

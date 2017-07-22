@@ -37,7 +37,7 @@
 
 #import <ObjFW/OFAutoreleasePool.h>
 #import <ObjFW/OFArray.h>
-#import <ObjFW/OFDataArray.h>
+#import <ObjFW/OFData.h>
 #import <ObjFW/OFDictionary.h>
 #import <ObjFW/OFFile.h>
 #import <ObjFW/OFInitializationFailedException.h>
@@ -72,11 +72,10 @@ OF_ASSUME_NONNULL_END
 
 	@try {
 		OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-		OFDataArray *data = [OFDataArray
-		    dataArrayWithContentsOfFile: path];
-		const unsigned char *dataCArray = [data items];
+		OFData *data = [OFData dataWithContentsOfFile: path];
+		const unsigned char *dataC = [data items];
 
-		_certificate = d2i_X509(NULL, &dataCArray, [data count]);
+		_certificate = d2i_X509(NULL, &dataC, [data count]);
 		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
 			    exceptionWithClass: [self class]];

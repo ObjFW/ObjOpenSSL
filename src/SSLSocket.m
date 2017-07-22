@@ -43,7 +43,7 @@
 
 #import <ObjFW/OFThread.h>
 #import <ObjFW/OFHTTPRequest.h>
-#import <ObjFW/OFDataArray.h>
+#import <ObjFW/OFData.h>
 #import <ObjFW/OFLocalization.h>
 
 #import <ObjFW/OFAcceptFailedException.h>
@@ -423,11 +423,10 @@ locking_callback(int mode, int n, const char *file, int line)
 	OF_UNRECOGNIZED_SELECTOR
 }
 
-- (OFDataArray *)channelBindingDataWithType: (OFString *)type
+- (OFData *)channelBindingDataWithType: (OFString *)type
 {
 	size_t length;
 	char buffer[64];
-	OFDataArray *data;
 
 	if (![type isEqual: @"tls-unique"])
 		@throw [OFInvalidArgumentException exception];
@@ -443,11 +442,8 @@ locking_callback(int mode, int n, const char *file, int line)
 		length = SSL_get_peer_finished(_SSL, buffer, 64);
 	}
 
-	data = [OFDataArray dataArray];
-	[data addItems: buffer
-		 count: length];
-
-	return data;
+	return [OFData dataWithItems: buffer
+			       count: length];
 }
 
 - (X509Certificate *)peerCertificate
