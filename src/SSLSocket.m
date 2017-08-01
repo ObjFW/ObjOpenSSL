@@ -134,9 +134,11 @@ locking_callback(int mode, int n, const char *file, int line)
 		@throw [OFInitializationFailedException
 		    exceptionWithClass: self];
 
+#if SSL_OP_NO_SSLv2 != 0
 	if ((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2) == 0)
 		@throw [OFInitializationFailedException
 		    exceptionWithClass: self];
+#endif
 
 	if (SSL_CTX_set_default_verify_paths(ctx) == 0)
 		@throw [OFInitializationFailedException
