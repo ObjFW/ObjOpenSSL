@@ -33,6 +33,7 @@ OF_ASSUME_NONNULL_BEGIN
 @interface SSLSocket: OFTCPSocket <OFTLSSocket>
 {
 	SSL *_SSL;
+	id <OFTLSSocketDelegate> _delegate;
 	OFString *_certificateFile, *_privateKeyFile;
 	const char *_privateKeyPassphrase;
 	bool _certificateVerificationEnabled;

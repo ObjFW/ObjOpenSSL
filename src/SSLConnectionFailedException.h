@@ -53,10 +53,10 @@ OF_ASSUME_NONNULL_BEGIN
 		     verifyResult: (long)verifyResult;
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket *)socket OF_UNAVAILABLE;
+	socket: (id)socket OF_UNAVAILABLE;
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port
-	socket: (SSLSocket *)socket
+	socket: (id)socket
 	 errNo: (int)errNo OF_UNAVAILABLE;
 - initWithHost: (OFString *)host
 	  port: (uint16_t)port

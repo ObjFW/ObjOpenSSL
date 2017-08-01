@@ -97,7 +97,7 @@ locking_callback(int mode, int n, const char *file, int line)
 @implementation SSLSocket
 @synthesize delegate = _delegate, certificateFile = _certificateFile;
 @synthesize privateKeyFile = _privateKeyFile;
-@synthesize privateKeyPassphrase = privateKeyPassphrase;
+@synthesize privateKeyPassphrase = _privateKeyPassphrase;
 @synthesize certificateVerificationEnabled = _certificateVerificationEnabled;
 @synthesize requestClientCertificatesEnabled =
     _requestClientCertificatesEnabled;
