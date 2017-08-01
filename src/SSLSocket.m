@@ -115,6 +115,8 @@ locking_callback(int mode, int n, const char *file, int line)
 		return;
 
 	CRYPTO_set_id_callback(&get_thread_id);
+	/* OpenSSL >= 1.1 defines the line above to a nop */
+	(void)get_thread_id;
 
 	/* Generate number of mutexes needed */
 	m = CRYPTO_num_locks();
@@ -123,6 +125,8 @@ locking_callback(int mode, int n, const char *file, int line)
 		of_mutex_new(&ssl_mutexes[m]);
 
 	CRYPTO_set_locking_callback(&locking_callback);
+	/* OpenSSL >= 1.1 defines the line above to a nop */
+	(void)locking_callback;
 
 	SSL_library_init();
 
