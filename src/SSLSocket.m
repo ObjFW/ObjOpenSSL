@@ -358,8 +358,8 @@ locking_callback(int mode, int n, const char *file, int line)
 	return ret;
 }
 
-- (void)lowlevelWriteBuffer: (const void *)buffer
-		     length: (size_t)length
+- (size_t)lowlevelWriteBuffer: (const void *)buffer
+		       length: (size_t)length
 {
 	int bytesWritten;
 
@@ -375,11 +375,7 @@ locking_callback(int mode, int n, const char *file, int line)
 						      bytesWritten: 0
 							     errNo: 0];
 
-	if ((size_t)bytesWritten != length)
-		@throw [OFWriteFailedException exceptionWithObject: self
-						   requestedLength: length
-						      bytesWritten: bytesWritten
-							     errNo: 0];
+	return bytesWritten;
 }
 
 - (bool)hasDataInReadBuffer
