@@ -43,7 +43,12 @@ PKG_CHECK_MODULES(openssl, [openssl >= 1.0.2], [
 	CPPFLAGS="$CPPFLAGS $openssl_CFLAGS"
 	LIBS="$LIBS $openssl_LIBS"
 ], [
-	AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
+	PKG_CHECK_MODULES(eopenssl, [eopenssl >= 1.0.2], [
+		CPPFLAGS="$CPPFLAGS $eopenssl_CFLAGS"
+		LIBS="$LIBS $eopenssl_LIBS"
+	], [
+		AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
+	])
 ])
 
 AS_IF([test x"$GOBJC" = x"yes"], [
