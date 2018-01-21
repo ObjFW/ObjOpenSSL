@@ -1,6 +1,7 @@
+*.dylib
+*.framework
 *.o
 *.so
-*.dylib
 *~
 .deps
 aclocal.m4
@@ -11,7 +12,3 @@ config.status
 configure
 DerivedData
 extra.mk
-ObjOpenSSL.xcodeproj/*.mode1v3
-ObjOpenSSL.xcodeproj/*.pbxuser
-ObjOpenSSL.xcodeproj/project.xcworkspace
-ObjOpenSSL.xcodeproj/xcuserdata
