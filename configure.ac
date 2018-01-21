@@ -31,6 +31,10 @@ AC_ARG_ENABLE(shared,
 AS_IF([test x"$enable_shared" != x"no"], [
 	BUILDSYS_SHARED_LIB
 	AC_SUBST(OBJOPENSSL_SHARED_LIB, "${LIB_PREFIX}objopenssl${LIB_SUFFIX}")
+
+	BUILDSYS_FRAMEWORK([
+		AC_SUBST(OBJOPENSSL_FRAMEWORK, "ObjOpenSSL.framework")
+	])
 ])
 AC_ARG_ENABLE(static, AS_HELP_STRING([--enable-static], [build static library]))
 AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
