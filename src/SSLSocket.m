@@ -199,6 +199,17 @@ locking_callback(int mode, int n, const char *file, int line)
 			     SSLError: error];
 	}
 
+	if (SSL_set_tlsext_host_name(_SSL, [host UTF8String]) != 1) {
+		unsigned long error = ERR_get_error();
+
+		[self close];
+
+		@throw [SSLConnectionFailedException exceptionWithHost: host
+								  port: port
+								socket: self
+							      SSLError: error];
+	}
+
 	if (_certificateVerificationEnabled) {
 		X509_VERIFY_PARAM *param = SSL_get0_param(_SSL);
 
