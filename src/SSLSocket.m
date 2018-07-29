@@ -44,7 +44,7 @@
 #import <ObjFW/OFThread.h>
 #import <ObjFW/OFHTTPRequest.h>
 #import <ObjFW/OFData.h>
-#import <ObjFW/OFLocalization.h>
+#import <ObjFW/OFLocale.h>
 
 #import <ObjFW/OFAcceptFailedException.h>
 #import <ObjFW/OFInitializationFailedException.h>
@@ -234,7 +234,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	SSL_set_connect_state(_SSL);
 
-	encoding = [OFLocalization encoding];
+	encoding = [OFLocale encoding];
 
 	if ((_privateKeyFile != nil && !SSL_use_PrivateKey_file(_SSL,
 	    [_privateKeyFile cStringWithEncoding: encoding],
@@ -309,7 +309,7 @@ locking_callback(int mode, int n, const char *file, int line)
 
 	SSL_set_accept_state(client->_SSL);
 
-	encoding = [OFLocalization encoding];
+	encoding = [OFLocale encoding];
 
 	if (!SSL_use_PrivateKey_file(client->_SSL, [_privateKeyFile
 	    cStringWithEncoding: encoding],
