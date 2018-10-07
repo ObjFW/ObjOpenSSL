@@ -35,10 +35,10 @@ OF_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic) unsigned long SSLError;
 @property (readonly, nonatomic) long verifyResult;
 
-+ (instancetype)exceptionWithHost: (OFString *)host
++ (instancetype)exceptionWithHost: (nullable OFString *)host
 			     port: (uint16_t)port
 			   socket: (id)socket OF_UNAVAILABLE;
-+ (instancetype)exceptionWithHost: (OFString *)host
++ (instancetype)exceptionWithHost: (nullable OFString *)host
 			     port: (uint16_t)port
 			   socket: (id)socket
 			    errNo: (int)errNo OF_UNAVAILABLE;
@@ -51,22 +51,22 @@ OF_ASSUME_NONNULL_BEGIN
 			   socket: (SSLSocket *)socket
 			 SSLError: (unsigned long)SSLError
 		     verifyResult: (long)verifyResult;
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (id)socket OF_UNAVAILABLE;
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (id)socket
-	 errNo: (int)errNo OF_UNAVAILABLE;
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (SSLSocket *)socket
-      SSLError: (unsigned long)SSLError;
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (SSLSocket *)socket
-      SSLError: (unsigned long)SSLError
-  verifyResult: (long)verifyResult OF_DESIGNATED_INITIALIZER;
+- (instancetype)initWithHost: (nullable OFString *)host
+			port: (uint16_t)port
+		      socket: (id)socket OF_UNAVAILABLE;
+- (instancetype)initWithHost: (nullable OFString *)host
+			port: (uint16_t)port
+		      socket: (id)socket
+		       errNo: (int)errNo OF_UNAVAILABLE;
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (SSLSocket *)socket
+		    SSLError: (unsigned long)SSLError;
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (SSLSocket *)socket
+		    SSLError: (unsigned long)SSLError
+		verifyResult: (long)verifyResult OF_DESIGNATED_INITIALIZER;
 @end
 
 OF_ASSUME_NONNULL_END

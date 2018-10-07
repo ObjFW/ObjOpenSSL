@@ -91,7 +91,82 @@ locking_callback(int mode, int n, const char *file, int line)
 }
 
 @interface SSLSocket ()
+- (void)SSL_startTLSWithExpectedHost: (OFString *)host
+				port: (uint16_t)port;
 - (void)SSL_super_close;
+@end
+
+@interface SSLSocket_ConnectContext: OFObject
+{
+	OFString *_host;
+	uint16_t _port;
+	id _target;
+	SEL _selector;
+	id _context;
+}
+
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      target: (id)target
+		    selector: (SEL)selector
+		     context: (id)context;
+- (void)socketDidConnect: (SSLSocket *)sock
+		 context: (id)context
+	       exception: (id)exception;
+@end
+
+@implementation SSLSocket_ConnectContext
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      target: (id)target
+		    selector: (SEL)selector
+		     context: (id)context
+{
+	self = [super init];
+
+	@try {
+		_host = [host copy];
+		_port = port;
+		_target = [target retain];
+		_selector = selector;
+		_context = [context retain];
+	} @catch (id e) {
+		[self release];
+		@throw e;
+	}
+
+	return self;
+}
+
+- (void)dealloc
+{
+	[_host release];
+	[_target release];
+	[_context release];
+
+	[super dealloc];
+}
+
+- (void)socketDidConnect: (SSLSocket *)sock
+		 context: (id)context
+	       exception: (id)exception
+{
+	void (*func)(id, SEL, OFTCPSocket *, id, id) =
+	    (void (*)(id, SEL, OFTCPSocket *, id, id))
+	    [_target methodForSelector: _selector];
+
+	if (exception == nil) {
+		@try {
+			[sock SSL_startTLSWithExpectedHost: _host
+						      port: _port];
+		} @catch (id e) {
+			func(_target, _selector, sock, _context, e);
+			return;
+		}
+	}
+
+	func(_target, _selector, sock, _context, exception);
+}
 @end
 
 @implementation SSLSocket
@@ -281,15 +356,57 @@ locking_callback(int mode, int n, const char *file, int line)
 				      port: 0];
 }
 
-- (void)connectToHost: (OFString *)host
-		 port: (uint16_t)port
+- (void)asyncConnectToHost: (OFString *)host
+		      port: (uint16_t)port
+	       runLoopMode: (of_run_loop_mode_t)runLoopMode
+		    target: (id)target
+		  selector: (SEL)selector
+		   context: (id)userContext
 {
-	[super connectToHost: host
-			port: port];
+	void *pool = objc_autoreleasePoolPush();
+	SSLSocket_ConnectContext *context;
 
-	[self SSL_startTLSWithExpectedHost: host
-				      port: port];
+	context = [[[SSLSocket_ConnectContext alloc]
+	    initWithHost: host
+		    port: port
+		  target: target
+		selector: selector
+		 context: userContext] autorelease];
+	[super asyncConnectToHost: host
+			     port: port
+		      runLoopMode: runLoopMode
+			   target: context
+			 selector: @selector(socketDidConnect:context:
+				       exception:)
+			  context: nil];
+
+	objc_autoreleasePoolPop(pool);
 }
+
+#ifdef OF_HAVE_BLOCKS
+- (void)asyncConnectToHost: (OFString *)host
+		      port: (uint16_t)port
+	       runLoopMode: (of_run_loop_mode_t)runLoopMode
+		     block: (of_tcp_socket_async_connect_block_t)block
+{
+	[super asyncConnectToHost: host
+			     port: port
+		      runLoopMode: runLoopMode
+			    block: ^ (SSLSocket *sock, id exception) {
+		if (exception == nil) {
+			@try {
+				[sock SSL_startTLSWithExpectedHost: host
+							      port: port];
+			} @catch (id e) {
+				block(sock, e);
+				return;
+			}
+		}
+
+		block(sock, exception);
+	}];
+}
+#endif
 
 - (instancetype)accept
 {
