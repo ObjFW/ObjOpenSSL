@@ -44,17 +44,11 @@ AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
 	AC_SUBST(OBJOPENSSL_STATIC_LIB, "libobjopenssl.a")
 ])
 
-PKG_CHECK_MODULES(openssl, [openssl >= 1.0.2], [
-	CPPFLAGS="$CPPFLAGS $openssl_CFLAGS"
-	LIBS="$LIBS $openssl_LIBS"
+AC_CHECK_LIB(ssl, main, [
+	LIBS="$LIBS -lssl -lcrypto"
 ], [
-	PKG_CHECK_MODULES(eopenssl, [eopenssl >= 1.0.2], [
-		CPPFLAGS="$CPPFLAGS $eopenssl_CFLAGS"
-		LIBS="$LIBS $eopenssl_LIBS"
-	], [
-		AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
-	])
-])
+	AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
+], [-lcrypto])
 
 AS_IF([test x"$GOBJC" = x"yes"], [
 	OBJCFLAGS="$OBJCFLAGS -Wwrite-strings -Wpointer-arith -Werror"
