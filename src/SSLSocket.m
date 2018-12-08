@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016
+ * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018
  *     Jonathan Schleifer <js@heap.zone>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
@@ -96,40 +96,35 @@ locking_callback(int mode, int n, const char *file, int line)
 - (void)SSL_super_close;
 @end
 
-@interface SSLSocket_ConnectContext: OFObject
+@interface SSLSocket_ConnectDelegate: OFObject <OFTLSSocketDelegate>
 {
+	SSLSocket *_socket;
 	OFString *_host;
 	uint16_t _port;
-	id _target;
-	SEL _selector;
-	id _context;
+	id <OFTLSSocketDelegate> _delegate;
 }
 
-- (instancetype)initWithHost: (OFString *)host
-			port: (uint16_t)port
-		      target: (id)target
-		    selector: (SEL)selector
-		     context: (id)context;
-- (void)socketDidConnect: (SSLSocket *)sock
-		 context: (id)context
-	       exception: (id)exception;
+- (instancetype)initWithSocket: (SSLSocket *)sock
+			  host: (OFString *)host
+			  port: (uint16_t)port
+		      delegate: (id <OFTLSSocketDelegate>)delegate;
 @end
 
-@implementation SSLSocket_ConnectContext
-- (instancetype)initWithHost: (OFString *)host
-			port: (uint16_t)port
-		      target: (id)target
-		    selector: (SEL)selector
-		     context: (id)context
+@implementation SSLSocket_ConnectDelegate
+- (instancetype)initWithSocket: (SSLSocket *)sock
+			  host: (OFString *)host
+			  port: (uint16_t)port
+		      delegate: (id <OFTLSSocketDelegate>)delegate
 {
 	self = [super init];
 
 	@try {
+		_socket = [sock retain];
 		_host = [host copy];
 		_port = port;
-		_target = [target retain];
-		_selector = selector;
-		_context = [context retain];
+		_delegate = [delegate retain];
+
+		[_socket setDelegate: self];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -140,37 +135,54 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)dealloc
 {
-	[_host release];
-	[_target release];
-	[_context release];
+	if ([_socket delegate] == self)
+		[_socket setDelegate: _delegate];
+
+	[_socket release];
+	[_delegate release];
 
 	[super dealloc];
 }
 
-- (void)socketDidConnect: (SSLSocket *)sock
-		 context: (id)context
-	       exception: (id)exception
+-     (void)socket: (OF_KINDOF(OFTCPSocket *))sock
+  didConnectToHost: (OFString *)host
+	      port: (uint16_t)port
 {
-	void (*func)(id, SEL, OFTCPSocket *, id, id) =
-	    (void (*)(id, SEL, OFTCPSocket *, id, id))
-	    [_target methodForSelector: _selector];
-
-	if (exception == nil) {
-		@try {
-			[sock SSL_startTLSWithExpectedHost: _host
-						      port: _port];
-		} @catch (id e) {
-			func(_target, _selector, sock, _context, e);
-			return;
-		}
+	@try {
+		[sock SSL_startTLSWithExpectedHost: _host
+					      port: _port];
+	} @catch (id e) {
+		[_socket setDelegate: _delegate];
+		[_delegate		   socket: sock
+		    didFailToConnectWithException: e
+					     host: host
+					     port: port];
+		return;
 	}
 
-	func(_target, _selector, sock, _context, exception);
+	[_socket setDelegate: _delegate];
+	[_delegate    socket: sock
+	    didConnectToHost: host
+			port: port];
+}
+
+-		   (void)socket: (OF_KINDOF(OFTCPSocket *))sock
+  didFailToConnectWithException: (id)exception
+			   host: (OFString *)host
+			   port: (uint16_t)port
+{
+	[_socket setDelegate: _delegate];
+
+	return [_delegate	   socket: sock
+	    didFailToConnectWithException: exception
+				     host: host
+				     port: port];
 }
 @end
 
 @implementation SSLSocket
-@synthesize delegate = _delegate, certificateFile = _certificateFile;
+@dynamic delegate;
+@synthesize certificateFile = _certificateFile;
 @synthesize privateKeyFile = _privateKeyFile;
 @synthesize privateKeyPassphrase = _privateKeyPassphrase;
 @synthesize certificateVerificationEnabled = _certificateVerificationEnabled;
@@ -359,26 +371,18 @@ locking_callback(int mode, int n, const char *file, int line)
 - (void)asyncConnectToHost: (OFString *)host
 		      port: (uint16_t)port
 	       runLoopMode: (of_run_loop_mode_t)runLoopMode
-		    target: (id)target
-		  selector: (SEL)selector
-		   context: (id)userContext
 {
 	void *pool = objc_autoreleasePoolPush();
-	SSLSocket_ConnectContext *context;
+	SSLSocket_ConnectDelegate *connectDelegate;
 
-	context = [[[SSLSocket_ConnectContext alloc]
-	    initWithHost: host
-		    port: port
-		  target: target
-		selector: selector
-		 context: userContext] autorelease];
+	connectDelegate = [[[SSLSocket_ConnectDelegate alloc]
+	    initWithSocket: self
+		      host: host
+		      port: port
+		  delegate: _delegate] autorelease];
 	[super asyncConnectToHost: host
 			     port: port
-		      runLoopMode: runLoopMode
-			   target: context
-			 selector: @selector(socketDidConnect:context:
-				       exception:)
-			  context: nil];
+		      runLoopMode: runLoopMode];
 
 	objc_autoreleasePoolPop(pool);
 }
