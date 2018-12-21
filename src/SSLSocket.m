@@ -147,36 +147,22 @@ locking_callback(int mode, int n, const char *file, int line)
 -     (void)socket: (OF_KINDOF(OFTCPSocket *))sock
   didConnectToHost: (OFString *)host
 	      port: (uint16_t)port
+	 exception: (id)exception
 {
-	@try {
-		[sock SSL_startTLSWithExpectedHost: _host
-					      port: _port];
-	} @catch (id e) {
-		[_socket setDelegate: _delegate];
-		[_delegate		   socket: sock
-		    didFailToConnectWithException: e
-					     host: host
-					     port: port];
-		return;
+	if (exception == nil) {
+		@try {
+			[sock SSL_startTLSWithExpectedHost: _host
+						      port: _port];
+		} @catch (id e) {
+			exception = e;
+		}
 	}
 
 	[_socket setDelegate: _delegate];
 	[_delegate    socket: sock
 	    didConnectToHost: host
-			port: port];
-}
-
--		   (void)socket: (OF_KINDOF(OFTCPSocket *))sock
-  didFailToConnectWithException: (id)exception
-			   host: (OFString *)host
-			   port: (uint16_t)port
-{
-	[_socket setDelegate: _delegate];
-
-	return [_delegate	   socket: sock
-	    didFailToConnectWithException: exception
-				     host: host
-				     port: port];
+			port: port
+		   exception: exception];
 }
 @end
 
