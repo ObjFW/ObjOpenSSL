@@ -44,6 +44,13 @@ AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
 	AC_SUBST(OBJOPENSSL_STATIC_LIB, "libobjopenssl.a")
 ])
 
+AC_ARG_WITH(openssl, AS_HELP_STRING([--with-openssl=PREFIX],
+	[build with OpenSSL in the specified prefix]))
+AS_IF([test x"$with_openssl" != x"no"], [
+       CPPFLAGS="$CPPFLAGS -I$with_openssl/include"
+       LIBS="$LIBS -L$with_openssl/lib"
+])
+
 AC_CHECK_LIB(ssl, main, [
 	LIBS="$LIBS -lssl -lcrypto"
 ], [
@@ -61,6 +68,5 @@ dnl and add OBJCPPFLAGS to CPPFLAGS, thus we need to AC_SUBST these ourself.
 AC_SUBST(CPP)
 AC_SUBST(CPPFLAGS)
 
-AC_SUBST(PACKAGE, ObjOpenSSL)
 AC_CONFIG_FILES([buildsys.mk extra.mk])
 AC_OUTPUT
