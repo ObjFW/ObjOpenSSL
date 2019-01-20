@@ -4,20 +4,23 @@ include buildsys.mk
 include extra.mk
 
 install-extra:
-	i=packages/ObjOpenSSL; \
+	i=ObjOpenSSL.oc; \
+	packagesdir="${DESTDIR}$$(${OBJFW_CONFIG} --packages-dir)"; \
 	${INSTALL_STATUS}; \
-	if ${INSTALL} -m 644 $$i ${DESTDIR}$$(${OBJFW_CONFIG} --packages-dir)/ObjOpenSSL; then \
+	if ${MKDIR_P} $$packagesdir && ${INSTALL} -m 644 $$i $$packagesdir/$$i; then \
 		${INSTALL_OK}; \
 	else \
 		${INSTALL_FAILED}; \
 	fi
 
 uninstall-extra:
-	i=packages/ObjOpenSSL; \
-	if test -f ${DESTDIR}$$(${OBJFW_CONFIG} --packages-dir)/ObjOpenSSL; then \
-		if rm -f ${DESTDIR}$$(${OBJFW_CONFIG} --packages-dir)/ObjOpenSSL; then \
+	i=ObjOpenSSL.oc; \
+	packagesdir="${DESTDIR}$$(${OBJFW_CONFIG} --packages-dir)"; \
+	if test -f $$packagesdir/$$i; then \
+		if rm -f $$packagesdir/$$i; then \
 			${DELETE_OK}; \
 		else \
 			${DELETE_FAILED}; \
 		fi \
-	fi
+	fi; \
+	rmdir $$packagesdir >/dev/null 2>&1 || true

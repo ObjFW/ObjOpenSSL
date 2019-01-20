@@ -74,5 +74,5 @@ AC_SUBST(CPPFLAGS)
 AC_SUBST(OPENSSL_CPPFLAGS)
 AC_SUBST(OPENSSL_LIBS)
 
-AC_CONFIG_FILES([buildsys.mk extra.mk packages/ObjOpenSSL])
+AC_CONFIG_FILES([buildsys.mk extra.mk ObjOpenSSL.oc])
 AC_OUTPUT
