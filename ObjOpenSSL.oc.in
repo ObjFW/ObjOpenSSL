@@ -1,3 +1,3 @@
 package_description 1
 CPPFLAGS="$CPPFLAGS @OPENSSL_CPPFLAGS@"
-LIBS="@OPENSSL_LIBS@ $LIBS"
+LIBS="-lobjopenssl @OPENSSL_LIBS@ $LIBS"
