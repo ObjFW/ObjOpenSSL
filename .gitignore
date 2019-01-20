@@ -5,12 +5,12 @@
 *.so.*
 *~
 .deps
+DerivedData
+ObjOpenSSL.oc
 aclocal.m4
 autom4te.cache
 buildsys.mk
 config.log
 config.status
 configure
-DerivedData
 extra.mk
-packages/ObjOpenSSL
