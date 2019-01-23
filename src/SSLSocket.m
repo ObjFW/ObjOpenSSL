@@ -359,9 +359,8 @@ locking_callback(int mode, int n, const char *file, int line)
 	       runLoopMode: (of_run_loop_mode_t)runLoopMode
 {
 	void *pool = objc_autoreleasePoolPush();
-	SSLSocket_ConnectDelegate *connectDelegate;
 
-	connectDelegate = [[[SSLSocket_ConnectDelegate alloc]
+	[[[SSLSocket_ConnectDelegate alloc]
 	    initWithSocket: self
 		      host: host
 		      port: port
