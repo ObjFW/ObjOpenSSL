@@ -148,6 +148,6 @@
 			    _host, _port, [_socket class], error];
 	}
 
-	return [super description];
+	return super.description;
 }
 @end

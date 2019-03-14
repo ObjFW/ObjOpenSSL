@@ -71,13 +71,13 @@ static SSL_CTX *ctx;
 static of_mutex_t *ssl_mutexes;
 
 static unsigned long
-get_thread_id(void)
+threadID(void)
 {
 	return (unsigned long)(uintptr_t)[OFThread currentThread];
 }
 
 static void
-locking_callback(int mode, int n, const char *file, int line)
+lockingCallback(int mode, int n, const char *file, int line)
 {
 	/*
 	 * This function must handle up to CRYPTO_num_locks() mutexes.
@@ -124,7 +124,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		_port = port;
 		_delegate = [delegate retain];
 
-		[_socket setDelegate: self];
+		_socket.delegate = self;
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -135,8 +135,8 @@ locking_callback(int mode, int n, const char *file, int line)
 
 - (void)dealloc
 {
-	if ([_socket delegate] == self)
-		[_socket setDelegate: _delegate];
+	if (_socket.delegate == self)
+		_socket.delegate = _delegate;
 
 	[_socket release];
 	[_delegate release];
@@ -158,7 +158,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		}
 	}
 
-	[_socket setDelegate: _delegate];
+	_socket.delegate = _delegate;
 	[_delegate    socket: sock
 	    didConnectToHost: host
 			port: port
@@ -187,9 +187,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (self != [SSLSocket class])
 		return;
 
-	CRYPTO_set_id_callback(&get_thread_id);
+	CRYPTO_set_id_callback(&threadID);
 	/* OpenSSL >= 1.1 defines the line above to a nop */
-	(void)get_thread_id;
+	(void)threadID;
 
 	/* Generate number of mutexes needed */
 	m = CRYPTO_num_locks();
@@ -197,9 +197,9 @@ locking_callback(int mode, int n, const char *file, int line)
 	for (m--; m >= 0; m--)
 		of_mutex_new(&ssl_mutexes[m]);
 
-	CRYPTO_set_locking_callback(&locking_callback);
+	CRYPTO_set_locking_callback(&lockingCallback);
 	/* OpenSSL >= 1.1 defines the line above to a nop */
-	(void)locking_callback;
+	(void)lockingCallback;
 
 	SSL_library_init();
 
@@ -272,7 +272,7 @@ locking_callback(int mode, int n, const char *file, int line)
 			     SSLError: error];
 	}
 
-	if (SSL_set_tlsext_host_name(_SSL, [host UTF8String]) != 1) {
+	if (SSL_set_tlsext_host_name(_SSL, host.UTF8String) != 1) {
 		unsigned long error = ERR_get_error();
 
 		[self close];
@@ -290,7 +290,7 @@ locking_callback(int mode, int n, const char *file, int line)
 		    X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
 
 		if (X509_VERIFY_PARAM_set1_host(param,
-		    [host UTF8String], [host UTF8StringLength]) != 1) {
+		    host.UTF8String, host.UTF8StringLength) != 1) {
 			unsigned long error = ERR_get_error();
 
 			[self close];
@@ -313,8 +313,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	    [_privateKeyFile cStringWithEncoding: encoding],
 	    SSL_FILETYPE_PEM)) || (_certificateFile != nil &&
 	    !SSL_use_certificate_file(_SSL, [_certificateFile
-	    cStringWithEncoding: encoding],
-	    SSL_FILETYPE_PEM))) {
+	    cStringWithEncoding: encoding], SSL_FILETYPE_PEM))) {
 		unsigned long error = ERR_get_error();
 
 		[super close];
@@ -500,7 +499,7 @@ locking_callback(int mode, int n, const char *file, int line)
 	if (_SSL != NULL && SSL_pending(_SSL) > 0)
 		return true;
 
-	return [super hasDataInReadBuffer];
+	return super.hasDataInReadBuffer;
 }
 
 - (void)setCertificateFile: (OFString *)certificateFile

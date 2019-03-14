@@ -73,12 +73,12 @@ OF_ASSUME_NONNULL_END
 	@try {
 		OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 		OFData *data = [OFData dataWithContentsOfFile: path];
-		const unsigned char *dataC = [data items];
+		const unsigned char *dataItems = data.items;
 
-		_certificate = d2i_X509(NULL, &dataC, [data count]);
+		_certificate = d2i_X509(NULL, &dataItems, data.count);
 		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
-			    exceptionWithClass: [self class]];
+			    exceptionWithClass: self.class];
 
 		[pool release];
 	} @catch (id e) {
@@ -97,7 +97,7 @@ OF_ASSUME_NONNULL_END
 		_certificate = X509_dup(certificate);
 		if (_certificate == NULL)
 			@throw [OFInitializationFailedException
-			    exceptionWithClass: [self class]];
+			    exceptionWithClass: self.class];
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -120,14 +120,17 @@ OF_ASSUME_NONNULL_END
 
 - (OFString *)description
 {
-	OFMutableString *ret = [OFMutableString string];
+	OFString *issuer = [self.issuer.description
+	    stringByReplacingOccurrencesOfString: @"\n"
+				      withString: @"\n\t"];
 
-	[ret appendFormat: @"Issuer: %@\n\n", [self issuer]];
-	[ret appendFormat: @"Subject: %@\n\n", [self subject]];
-	[ret appendFormat: @"SANs: %@", [self subjectAlternativeName]];
-
-	[ret makeImmutable];
-	return ret;
+	return [OFString stringWithFormat:
+	    @"<%@\n"
+	    @"\tIssuer: %@\n"
+	    @"\tSubject: %@\n"
+	    @"\tSANs: %@\n"
+	    @">",
+	    self.class, issuer, self.subject, self.subjectAlternativeName];
 }
 
 - (OFDictionary *)issuer
@@ -317,21 +320,21 @@ OF_ASSUME_NONNULL_END
 {
 	size_t serviceLength;
 	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
-	OFDictionary *SANs = [self subjectAlternativeName];
+	OFDictionary *SANs = self.subjectAlternativeName;
 	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
-				     objectForKey: OID_SRVName];
+				       objectForKey: OID_SRVName];
 
 	if (![service hasPrefix: @"_"])
 		service = [service stringByPrependingString: @"_"];
 
 	service = [service stringByAppendingString: @"."];
-	serviceLength = [service length];
+	serviceLength = service.length;
 
 	for (OFString *name in assertedNames) {
 		if ([name hasPrefix: service]) {
 			OFString *asserted;
 			asserted = [name substringWithRange: of_range(
-			    serviceLength, [name length] - serviceLength)];
+			    serviceLength, name.length - serviceLength)];
 			if ([self X509_isAssertedDomain: asserted
 					    equalDomain: domain]) {
 				[pool release];
@@ -363,14 +366,14 @@ OF_ASSUME_NONNULL_END
 		return false;
 
 	asserted = [asserted substringWithRange:
-	    of_range(2, [asserted length] - 2)];
+	    of_range(2, asserted.length - 2)];
 
 	firstDot = [domain rangeOfString: @"."].location;
 	if (firstDot == OF_NOT_FOUND)
 		return false;
 
 	domain = [domain substringWithRange:
-	    of_range(firstDot + 1, [domain length] - firstDot - 1)];
+	    of_range(firstDot + 1, domain.length - firstDot - 1)];
 
 	if (![asserted caseInsensitiveCompare: domain])
 		return true;
@@ -479,7 +482,7 @@ OF_ASSUME_NONNULL_END
 - (OFString *)description
 {
 	char tmp[1024];
-	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj([_string UTF8String], 1), 0);
+	OBJ_obj2txt(tmp, sizeof(tmp), OBJ_txt2obj(_string.UTF8String, 1), 0);
 	return [OFString stringWithUTF8String: tmp];
 }
 
@@ -499,7 +502,7 @@ OF_ASSUME_NONNULL_END
 
 - (uint32_t)hash
 {
-	return [_string hash];
+	return _string.hash;
 }
 
 - copy
