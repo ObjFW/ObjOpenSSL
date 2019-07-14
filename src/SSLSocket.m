@@ -380,7 +380,9 @@ lockingCallback(int mode, int n, const char *file, int line)
 	[super asyncConnectToHost: host
 			     port: port
 		      runLoopMode: runLoopMode
-			    block: ^ (SSLSocket *sock, id exception) {
+			    block: ^ (OFTCPSocket *sock_, id exception) {
+		SSLSocket *sock = (SSLSocket *)sock_;
+
 		if (exception == nil) {
 			@try {
 				[sock SSL_startTLSWithExpectedHost: host
@@ -448,6 +450,16 @@ lockingCallback(int mode, int n, const char *file, int line)
 {
 	ssize_t ret;
 
+	/*
+	 * There is no SSL session yet. However, it might be necessary to read
+	 * from and write to the socket before negotiating an SSL session: For
+	 * example, the socket might be connected to a SOCKS5 proxy and needs
+	 * to establish a SOCKS5 connection before negotiating an SSL session.
+	 */
+	if (_SSL == NULL)
+		return [super lowlevelReadIntoBuffer: buffer
+					      length: length];
+
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exception];
 
@@ -478,6 +490,20 @@ lockingCallback(int mode, int n, const char *file, int line)
 		       length: (size_t)length
 {
 	int bytesWritten;
+
+	/*
+	 * There is no SSL session yet. However, it might be necessary to read
+	 * from and write to the socket before negotiating an SSL session: For
+	 * example, the socket might be connected to a SOCKS5 proxy and needs
+	 * to establish a SOCKS5 connection before negotiating an SSL session.
+	 *
+	 * TODO: Think of a way to make this safer, so that it's impossible to
+	 * forget to establish an SSL session and then send unencrypted data by
+	 * accident.
+	 */
+	if (_SSL == NULL)
+		return [super lowlevelWriteBuffer: buffer
+					   length: length];
 
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotOpenException exceptionWithObject: self];
