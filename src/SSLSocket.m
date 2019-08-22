@@ -55,7 +55,7 @@
 #import <ObjFW/OFWriteFailedException.h>
 
 #import <ObjFW/macros.h>
-#import <ObjFW/threading.h>
+#import <ObjFW/mutex.h>
 
 #import "SSLSocket.h"
 #import "X509Certificate.h"
