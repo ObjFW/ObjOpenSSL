@@ -21,7 +21,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wdocumentation"
+#endif
 #include <openssl/ssl.h>
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
 
 #import <ObjFW/OFTCPSocket.h>
 #import <ObjFW/OFTLSSocket.h>
