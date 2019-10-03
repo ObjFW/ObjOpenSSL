@@ -35,7 +35,6 @@
 
 #import "X509Certificate.h"
 
-#import <ObjFW/OFAutoreleasePool.h>
 #import <ObjFW/OFArray.h>
 #import <ObjFW/OFData.h>
 #import <ObjFW/OFDictionary.h>
@@ -71,7 +70,7 @@ OF_ASSUME_NONNULL_END
 	self = [super init];
 
 	@try {
-		OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+		void *pool = objc_autoreleasePoolPush();
 		OFData *data = [OFData dataWithContentsOfFile: path];
 		const unsigned char *dataItems = data.items;
 
@@ -80,7 +79,7 @@ OF_ASSUME_NONNULL_END
 			@throw [OFInitializationFailedException
 			    exceptionWithClass: self.class];
 
-		[pool release];
+		objc_autoreleasePoolPop(pool);
 	} @catch (id e) {
 		[self release];
 		@throw e;
@@ -161,7 +160,6 @@ OF_ASSUME_NONNULL_END
 
 - (OFDictionary *)subjectAlternativeName
 {
-	OFAutoreleasePool *pool;
 	OFMutableDictionary *ret;
 	int i;
 
@@ -169,11 +167,11 @@ OF_ASSUME_NONNULL_END
 		return [[_subjectAlternativeName copy] autorelease];
 
 	ret = [OFMutableDictionary dictionary];
-	pool = [[OFAutoreleasePool alloc] init];
 
 	i = -1;
 	while ((i = X509_get_ext_by_NID(_certificate,
 	    NID_subject_alt_name, i)) != -1) {
+		void *pool = objc_autoreleasePoolPush();
 		X509_EXTENSION *extension;
 		STACK_OF(GENERAL_NAME) *values;
 		int j, count;
@@ -271,10 +269,9 @@ OF_ASSUME_NONNULL_END
 		}
 
 		i++; /* Next extension */
-		[pool releaseObjects];
+		objc_autoreleasePoolPop(pool);
 	}
 
-	[pool release];
 
 	[ret makeImmutable];
 	_subjectAlternativeName = [ret retain];
@@ -284,34 +281,34 @@ OF_ASSUME_NONNULL_END
 
 - (bool)hasCommonNameMatchingDomain: (OFString *)domain
 {
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	void *pool = objc_autoreleasePoolPush();
 
 	for (OFString *name in [[self subject] objectForKey: OID_commonName]) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
-			[pool release];
+			objc_autoreleasePoolPop(pool);
 			return true;
 		}
 	}
 
-	[pool release];
+	objc_autoreleasePoolPop(pool);
 	return false;
 }
 
 - (bool)hasDNSNameMatchingDomain: (OFString *)domain
 {
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	void *pool = objc_autoreleasePoolPush();
 
 	for (OFString *name in
 	    [[self subjectAlternativeName] objectForKey: @"dNSName"]) {
 		if ([self X509_isAssertedDomain: name
 				    equalDomain: domain]) {
-			[pool release];
+			objc_autoreleasePoolPop(pool);
 			return true;
 		}
 	}
 
-	[pool release];
+	objc_autoreleasePoolPop(pool);
 	return false;
 }
 
@@ -319,7 +316,7 @@ OF_ASSUME_NONNULL_END
 			 service: (OFString *)service
 {
 	size_t serviceLength;
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
+	void *pool = objc_autoreleasePoolPush();
 	OFDictionary *SANs = self.subjectAlternativeName;
 	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
 				       objectForKey: OID_SRVName];
@@ -337,13 +334,13 @@ OF_ASSUME_NONNULL_END
 			    serviceLength, name.length - serviceLength)];
 			if ([self X509_isAssertedDomain: asserted
 					    equalDomain: domain]) {
-				[pool release];
+				objc_autoreleasePoolPop(pool);
 				return true;
 			}
 		}
 	}
 
-	[pool release];
+	objc_autoreleasePoolPop(pool);
 	return false;
 }
 
@@ -384,10 +381,10 @@ OF_ASSUME_NONNULL_END
 - (OFDictionary *)X509_dictionaryFromX509Name: (X509_NAME *)name
 {
 	OFMutableDictionary *dict = [OFMutableDictionary dictionary];
-	OFAutoreleasePool *pool = [[OFAutoreleasePool alloc] init];
 	int i, count = X509_NAME_entry_count(name);
 
 	for (i = 0; i < count; i++) {
+		void *pool = objc_autoreleasePoolPush();
 		X509OID *key;
 		OFString *value;
 		X509_NAME_ENTRY *entry = X509_NAME_get_entry(name, i);
@@ -402,10 +399,8 @@ OF_ASSUME_NONNULL_END
 		value = [self X509_stringFromASN1String: str];
 		[[dict objectForKey: key] appendObject: value];
 
-		[pool releaseObjects];
+		objc_autoreleasePoolPop(pool);
 	}
-
-	[pool release];
 
 	[dict makeImmutable];
 	return dict;
