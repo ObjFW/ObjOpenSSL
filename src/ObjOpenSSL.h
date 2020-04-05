@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2011, Jonathan Schleifer <js@heap.zone>
+ * Copyright (c) 2011, Jonathan Schleifer <js@nil.im>
  *
- * https://heap.zone/git/objopenssl.git
+ * https://git.nil.im/objopenssl.git
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018
- *     Jonathan Schleifer <js@heap.zone>
+ * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
+ *     Jonathan Schleifer <js@nil.im>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
- * https://heap.zone/git/objopenssl.git
+ * https://git.nil.im/objopenssl.git
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -144,15 +144,15 @@ lockingCallback(int mode, int n, const char *file, int line)
 	[super dealloc];
 }
 
--     (void)socket: (OF_KINDOF(OFTCPSocket *))sock
+-     (void)socket: (OFTCPSocket *)sock
   didConnectToHost: (OFString *)host
 	      port: (uint16_t)port
 	 exception: (id)exception
 {
 	if (exception == nil) {
 		@try {
-			[sock SSL_startTLSWithExpectedHost: _host
-						      port: _port];
+			[(SSLSocket *)sock SSL_startTLSWithExpectedHost: _host
+								   port: _port];
 		} @catch (id e) {
 			exception = e;
 		}
