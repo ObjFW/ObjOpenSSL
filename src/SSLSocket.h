@@ -42,16 +42,14 @@ OF_ASSUME_NONNULL_BEGIN
 	SSL *_SSL;
 	OFString *_certificateFile, *_privateKeyFile;
 	const char *_privateKeyPassphrase;
-	bool _certificateVerificationEnabled;
-	bool _requestClientCertificatesEnabled;
+	bool _verifiesCertificates, _requestsClientCertificates;
 }
 
-@property (nonatomic, getter=isRequestClientCertificatesEnabled)
-    bool requestClientCertificatesEnabled;
+@property (nonatomic) bool requestsClientCertificates;
 @property OF_NULLABLE_PROPERTY (readonly, nonatomic)
     X509Certificate *peerCertificate;
 
-- initWithSocket: (OFTCPSocket *)socket;
+- (instancetype)initWithSocket: (OFTCPSocket *)socket;
 - (OFData *)channelBindingDataWithType: (OFString *)type;
 - (nullable X509Certificate *)peerCertificate;
 - (void)verifyPeerCertificate;

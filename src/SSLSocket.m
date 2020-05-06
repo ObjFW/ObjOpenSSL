@@ -171,9 +171,8 @@ lockingCallback(int mode, int n, const char *file, int line)
 @synthesize certificateFile = _certificateFile;
 @synthesize privateKeyFile = _privateKeyFile;
 @synthesize privateKeyPassphrase = _privateKeyPassphrase;
-@synthesize certificateVerificationEnabled = _certificateVerificationEnabled;
-@synthesize requestClientCertificatesEnabled =
-    _requestClientCertificatesEnabled;
+@synthesize verifiesCertificates = _verifiesCertificates;
+@synthesize requestsClientCertificates = _requestsClientCertificates;
 
 + (void)load
 {
@@ -218,16 +217,16 @@ lockingCallback(int mode, int n, const char *file, int line)
 		    exceptionWithClass: self];
 }
 
-- init
+- (instancetype)init
 {
 	self = [super init];
 
-	_certificateVerificationEnabled = true;
+	_verifiesCertificates = true;
 
 	return self;
 }
 
-- initWithSocket: (OFTCPSocket *)socket
+- (instancetype)initWithSocket: (OFTCPSocket *)socket
 {
 	self = [self init];
 
@@ -283,7 +282,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 							      SSLError: error];
 	}
 
-	if (_certificateVerificationEnabled) {
+	if (_verifiesCertificates) {
 		X509_VERIFY_PARAM *param = SSL_get0_param(_SSL);
 
 		X509_VERIFY_PARAM_set_hostflags(param,
@@ -380,20 +379,18 @@ lockingCallback(int mode, int n, const char *file, int line)
 	[super asyncConnectToHost: host
 			     port: port
 		      runLoopMode: runLoopMode
-			    block: ^ (OFTCPSocket *sock_, id exception) {
-		SSLSocket *sock = (SSLSocket *)sock_;
-
+			    block: ^ (id exception) {
 		if (exception == nil) {
 			@try {
-				[sock SSL_startTLSWithExpectedHost: host
+				[self SSL_startTLSWithExpectedHost: host
 							      port: port];
 			} @catch (id e) {
-				block(sock, e);
+				block(e);
 				return;
 			}
 		}
 
-		block(sock, exception);
+		block(exception);
 	}];
 }
 #endif
@@ -411,7 +408,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 							      errNo: 0];
 	}
 
-	if (_requestClientCertificatesEnabled)
+	if (_requestsClientCertificates)
 		SSL_set_verify(client->_SSL, SSL_VERIFY_PEER, NULL);
 
 	SSL_set_accept_state(client->_SSL);
