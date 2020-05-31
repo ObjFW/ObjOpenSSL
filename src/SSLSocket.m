@@ -4,7 +4,7 @@
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
- * https://git.nil.im/objopenssl.git
+ * https://fossil.nil.im/objopenssl
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
