@@ -1,8 +1,13 @@
 AC_INIT(ObjOpenSSL, 0.1, js@nil.im)
-
 AC_CONFIG_SRCDIR(src)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(build-aux/m4)
+
+for i in configure.ac build-aux/m4/*; do
+	AS_IF([test $i -nt configure], [
+		AC_MSG_ERROR([$i is newer than configure! Run ./autogen.sh!])
+	])
+done
 
 AC_CHECK_TOOL(OBJFW_CONFIG, objfw-config)
 AS_IF([test x"$OBJFW_CONFIG" = x""], [
@@ -47,10 +52,10 @@ AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
 AC_ARG_WITH(openssl, AS_HELP_STRING([--with-openssl=PREFIX],
 	[build with OpenSSL in the specified prefix]))
 AS_IF([test x"$with_openssl" != x"no" -a x"$with_openssl" != x""], [
-       OPENSSL_CPPFLAGS="$CPPFLAGS -I$with_openssl/include"
-       OPENSSL_LIBS="$LIBS -L$with_openssl/lib"
-       CPPFLAGS="$CPPFLAGS $OPENSSL_CPPFLAGS"
-       LIBS="$LIBS $OPENSSL_LIBS"
+       OPENSSL_CPPFLAGS="$OPENSSL_CFLAGS -I$with_openssl/include"
+       OPENSSL_LIBS="$OPENSSL_LIBS -L$with_openssl/lib"
+       CPPFLAGS="$CPPFLAGS -I$with_openssl/include"
+       LIBS="$LIBS -L$with_openssl/lib"
 ])
 
 AC_CHECK_LIB(ssl, main, [
