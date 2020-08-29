@@ -21,18 +21,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(__clang__)
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wdocumentation"
-#endif
-
-#include <openssl/crypto.h>
-#include <openssl/x509v3.h>
-
-#if defined(__clang__)
-# pragma clang diagnostic pop
-#endif
-
 #import "X509Certificate.h"
 
 #import <ObjFW/OFArray.h>
@@ -46,6 +34,23 @@
 #import <ObjFW/OFString.h>
 
 #import <ObjFW/macros.h>
+
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wdocumentation"
+#endif
+
+#ifdef X509_NAME
+/* wincrypt.h has a conflicting define. */
+# undef X509_NAME
+#endif
+
+#include <openssl/crypto.h>
+#include <openssl/x509v3.h>
+
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 
 OF_ASSUME_NONNULL_BEGIN
 
