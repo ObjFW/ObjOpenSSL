@@ -1,9 +1,9 @@
 dnl
 dnl Copyright (c) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017,
-dnl               2018
-dnl   Jonathan Schleifer <js@heap.zone>
+dnl               2018, 2020
+dnl   Jonathan Schleifer <js@nil.im>
 dnl
-dnl https://heap.zone/git/?p=buildsys.git
+dnl https://fossil.nil.im/buildsys
 dnl
 dnl Permission to use, copy, modify, and/or distribute this software for any
 dnl purpose with or without fee is hereby granted, provided that the above
@@ -37,12 +37,15 @@ AC_DEFUN([BUILDSYS_INIT], [
 	esac
 
 	AC_CONFIG_COMMANDS_PRE([
-		AC_SUBST(CC_DEPENDS, $GCC)
-		AC_SUBST(CXX_DEPENDS, $GXX)
-		AC_SUBST(OBJC_DEPENDS, $GOBJC)
-		AC_SUBST(OBJCXX_DEPENDS, $GOBJCXX)
+		AS_IF([test x"$GCC" = x"yes"],
+			[AC_SUBST(DEP_CFLAGS, '-MD -MF $${out%.o}.dep')])
+		AS_IF([test x"$GXX" = x"yes"],
+			[AC_SUBST(DEP_CXXFLAGS, '-MD -MF $${out%.o}.dep')])
+		AS_IF([test x"$GOBJC" = x"yes"],
+			[AC_SUBST(DEP_OBJCFLAGS, '-MD -MF $${out%.o}.dep')])
+		AS_IF([test x"$GOBJCXX" = x"yes"],
+			[AC_SUBST(DEP_OBJCXXFLAGS, '-MD -MF $${out%.o}.dep')])
 
-		AMIGA_LIB_LDFLAGS="-nostartfiles"
 		AC_SUBST(AMIGA_LIB_CFLAGS)
 		AC_SUBST(AMIGA_LIB_LDFLAGS)
 
@@ -104,15 +107,6 @@ AC_DEFUN([BUILDSYS_INIT], [
 					"$($TPUT AF 6 2>/dev/null)")
 			fi
 		])
-	])
-
-	AC_CONFIG_COMMANDS_POST([
-		${as_echo:="echo"} ${as_me:="configure"}": touching .deps files"
-		for i in $(find . -name Makefile); do
-			DEPSFILE="$(dirname $i)/.deps"
-			test -f "$DEPSFILE" && rm "$DEPSFILE"
-			touch -t 0001010000 "$DEPSFILE"
-		done
 	])
 ])
 
@@ -190,17 +184,17 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 		mingw* | cygwin*)
 			AC_MSG_RESULT(MinGW / Cygwin)
 			LIB_CFLAGS=''
-			LIB_LDFLAGS='-shared -Wl,--export-all-symbols,--out-implib,${SHARED_LIB}.a'
+			LIB_LDFLAGS='-shared -Wl,--export-all-symbols,--out-implib,lib${SHARED_LIB}.a'
 			LIB_LDFLAGS_INSTALL_NAME=''
-			LIB_PREFIX='lib'
+			LIB_PREFIX=''
 			LIB_SUFFIX='.dll'
 			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-shared'
 			PLUGIN_SUFFIX='.dll'
 			LINK_PLUGIN='${LD} -o $$out ${PLUGIN_OBJS} ${PLUGIN_OBJS_EXTRA} ${PLUGIN_LDFLAGS} ${LDFLAGS} ${LIBS}'
-			INSTALL_LIB='&& ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i && ${INSTALL} -m 755 $$i.a ${DESTDIR}${libdir}/$$i.a'
-			UNINSTALL_LIB='&& rm -f ${DESTDIR}${bindir}/$$i ${DESTDIR}${libdir}/$$i.a'
+			INSTALL_LIB='&& ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i && ${INSTALL} -m 755 lib$$i.a ${DESTDIR}${libdir}/lib$$i.a'
+			UNINSTALL_LIB='&& rm -f ${DESTDIR}${bindir}/$$i ${DESTDIR}${libdir}/lib$$i.a'
 			INSTALL_PLUGIN='&& ${INSTALL} -m 755 $$i ${DESTDIR}${plugindir}/$$i'
 			UNINSTALL_PLUGIN='&& rm -f ${DESTDIR}${plugindir}/$$i'
 			CLEAN_LIB='${SHARED_LIB}.a'
