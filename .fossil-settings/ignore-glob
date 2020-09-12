@@ -5,6 +5,7 @@
 *.so.*
 *~
 .deps
+.git
 ObjOpenSSL.oc
 aclocal.m4
 autom4te.cache
