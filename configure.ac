@@ -26,8 +26,8 @@ CPP="$OBJCPP"
 CPPFLAGS="$CPPFLAGS $OBJCPPFLAGS $($OBJFW_CONFIG --cppflags)"
 OBJCFLAGS="$OBJCFLAGS -Wall $($OBJFW_CONFIG --objcflags)"
 LDFLAGS="$LDFLAGS $($OBJFW_CONFIG --ldflags --rpath)"
-AC_SUBST(OBJFW_LIBS, "$($OBJFW_CONFIG --libs)")
-AC_SUBST(OBJFW_FRAMEWORK_LIBS, "$($OBJFW_CONFIG --framework-libs)")
+FRAMEWORK_LIBS="$($OBJFW_CONFIG --framework-libs)"
+LIBS="$($OBJFW_CONFIG --libs --rpath)"
 
 AX_CHECK_COMPILER_FLAGS(-Wdocumentation,
 	[OBJCFLAGS="$OBJCFLAGS -Wdocumentation"])
@@ -55,12 +55,14 @@ AS_IF([test x"$with_openssl" != x"no" -a x"$with_openssl" != x""], [
        OPENSSL_CPPFLAGS="$OPENSSL_CFLAGS -I$with_openssl/include"
        OPENSSL_LIBS="$OPENSSL_LIBS -L$with_openssl/lib"
        CPPFLAGS="$CPPFLAGS -I$with_openssl/include"
-       LIBS="$LIBS -L$with_openssl/lib"
+       LIBS="-L$with_openssl/lib $LIBS"
+       FRAMEWORK_LIBS="-L$with_openssl/lib $FRAMEWORK_LIBS"
 ])
 
 AC_CHECK_LIB(ssl, main, [
 	OPENSSL_LIBS="$OPENSSL_LIBS -lssl -lcrypto"
 	LIBS="$LIBS -lssl -lcrypto"
+	FRAMEWORK_LIBS="$FRAMEWORK_LIBS -lssl -lcrypto"
 ], [
 	AC_MSG_ERROR(You need openssl >= 1.0.2 installed!)
 ], [-lcrypto])

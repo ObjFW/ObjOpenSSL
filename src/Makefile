@@ -17,5 +17,3 @@ INCLUDES = ${SRCS:.m=.h}	\
 include ../buildsys.mk
 
 LD = ${OBJC}
-FRAMEWORK_LIBS := ${OBJFW_FRAMEWORK_LIBS} ${LIBS}
-LIBS := ${OBJFW_LIBS} ${LIBS}
