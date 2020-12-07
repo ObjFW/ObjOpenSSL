@@ -416,20 +416,19 @@ OF_ASSUME_NONNULL_END
 {
 	X509OID *ret;
 	int length, bufferLength = 256;
-	char *buffer = [self allocMemoryWithSize: bufferLength];
+	char *buffer = of_alloc(1, bufferLength);
 
 	@try {
 		while ((length = OBJ_obj2txt(buffer, bufferLength, object,
 		    1)) > bufferLength) {
 			bufferLength = length;
-			buffer = [self resizeMemory: buffer
-					       size: bufferLength];
+			buffer = of_realloc(buffer, 1, bufferLength);
 		}
 
 		ret = [[[X509OID alloc]
 		    initWithUTF8String: buffer] autorelease];
 	} @finally {
-		[self freeMemory: buffer];
+		free(buffer);
 	}
 
 	return ret;
@@ -500,7 +499,7 @@ OF_ASSUME_NONNULL_END
 	return false;
 }
 
-- (uint32_t)hash
+- (unsigned long)hash
 {
 	return _string.hash;
 }
