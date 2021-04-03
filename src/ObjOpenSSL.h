@@ -21,3 +21,7 @@
  */
 
 #import "SSLSocket.h"
+#import "X509Certificate.h"
+
+#import "SSLConnectionFailedException.h"
+#import "SSLInvalidCertificateException.h"

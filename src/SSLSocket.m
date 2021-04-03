@@ -91,8 +91,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 }
 
 @interface SSLSocket ()
-- (void)SSL_startTLSWithExpectedHost: (OFString *)host
-				port: (uint16_t)port;
+- (void)SSL_startTLSWithExpectedHost: (OFString *)host port: (uint16_t)port;
 - (void)SSL_super_close;
 @end
 
@@ -254,8 +253,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 		SSL_free(SSL_);
 }
 
-- (void)SSL_startTLSWithExpectedHost: (OFString *)host
-				port: (uint16_t)port
+- (void)SSL_startTLSWithExpectedHost: (OFString *)host port: (uint16_t)port
 {
 	of_string_encoding_t encoding;
 
@@ -348,8 +346,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 
 - (void)startTLSWithExpectedHost: (OFString *)host
 {
-	[self SSL_startTLSWithExpectedHost: host
-				      port: 0];
+	[self SSL_startTLSWithExpectedHost: host port: 0];
 }
 
 - (void)asyncConnectToHost: (OFString *)host
@@ -363,9 +360,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 		      host: host
 		      port: port
 		  delegate: _delegate] autorelease];
-	[super asyncConnectToHost: host
-			     port: port
-		      runLoopMode: runLoopMode];
+	[super asyncConnectToHost: host port: port runLoopMode: runLoopMode];
 
 	objc_autoreleasePoolPop(pool);
 }
@@ -442,8 +437,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	[super close];
 }
 
-- (size_t)lowlevelReadIntoBuffer: (void *)buffer
-			  length: (size_t)length
+- (size_t)lowlevelReadIntoBuffer: (void *)buffer length: (size_t)length
 {
 	ssize_t ret;
 
@@ -454,8 +448,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	 * to establish a SOCKS5 connection before negotiating an SSL session.
 	 */
 	if (_SSL == NULL)
-		return [super lowlevelReadIntoBuffer: buffer
-					      length: length];
+		return [super lowlevelReadIntoBuffer: buffer length: length];
 
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exception];
@@ -483,8 +476,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	return ret;
 }
 
-- (size_t)lowlevelWriteBuffer: (const void *)buffer
-		       length: (size_t)length
+- (size_t)lowlevelWriteBuffer: (const void *)buffer length: (size_t)length
 {
 	int bytesWritten;
 
@@ -499,8 +491,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	 * accident.
 	 */
 	if (_SSL == NULL)
-		return [super lowlevelWriteBuffer: buffer
-					   length: length];
+		return [super lowlevelWriteBuffer: buffer length: length];
 
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotOpenException exceptionWithObject: self];
@@ -583,8 +574,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 		length = SSL_get_peer_finished(_SSL, buffer, 64);
 	}
 
-	return [OFData dataWithItems: buffer
-			       count: length];
+	return [OFData dataWithItems: buffer count: length];
 }
 
 - (X509Certificate *)peerCertificate

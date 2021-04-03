@@ -48,8 +48,9 @@ OF_ASSUME_NONNULL_BEGIN
 	OFString *_string;
 }
 
-- init OF_UNAVAILABLE;
-- initWithUTF8String: (const char *)string OF_DESIGNATED_INITIALIZER;
+- (instancetype)init OF_UNAVAILABLE;
+- (instancetype)initWithUTF8String: (const char *)string
+    OF_DESIGNATED_INITIALIZER;
 @end
 
 @interface X509Certificate: OFObject
@@ -64,9 +65,9 @@ OF_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic) OFDictionary *subject;
 @property (readonly, nonatomic) OFDictionary *subjectAlternativeName;
 
-- init OF_UNAVAILABLE;
-- initWithFile: (OFString *)file;
-- initWithX509Struct: (X509 *)cert;
+- (instancetype)init OF_UNAVAILABLE;
+- (instancetype)initWithFile: (OFString *)file;
+- (instancetype)initWithX509Struct: (X509 *)cert;
 - (bool)hasCommonNameMatchingDomain: (OFString *)domain;
 - (bool)hasDNSNameMatchingDomain: (OFString *)domain;
 - (bool)hasSRVNameMatchingDomain: (OFString *)domain

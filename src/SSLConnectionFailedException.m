@@ -82,25 +82,25 @@
 			      verifyResult: verifyResult] autorelease];
 }
 
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (id)socket
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (id)socket
 {
 	OF_INVALID_INIT_METHOD
 }
 
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (id)socket
-	 errNo: (int)errNo
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (id)socket
+		       errNo: (int)errNo
 {
 	OF_INVALID_INIT_METHOD
 }
 
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (SSLSocket *)socket
-      SSLError: (unsigned long)SSLError
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (SSLSocket *)socket
+		    SSLError: (unsigned long)SSLError
 {
 	return [self initWithHost: host
 			     port: port
@@ -109,16 +109,13 @@
 		     verifyResult: 0];
 }
 
-- initWithHost: (OFString *)host
-	  port: (uint16_t)port
-	socket: (SSLSocket *)socket
-      SSLError: (unsigned long)SSLError
-  verifyResult: (long)verifyResult
+- (instancetype)initWithHost: (OFString *)host
+			port: (uint16_t)port
+		      socket: (SSLSocket *)socket
+		    SSLError: (unsigned long)SSLError
+		verifyResult: (long)verifyResult
 {
-	self = [super initWithHost: host
-			      port: port
-			    socket: socket
-			     errNo: 0];
+	self = [super initWithHost: host port: port socket: socket errNo: 0];
 
 	_SSLError = SSLError;
 	_verifyResult = verifyResult;

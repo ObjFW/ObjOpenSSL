@@ -40,12 +40,12 @@
 	return [[[self alloc] initWithReason: reason] autorelease];
 }
 
-- init
+- (instancetype)init
 {
 	OF_INVALID_INIT_METHOD
 }
 
-- initWithReason: (OFString *)reason
+- (instancetype)initWithReason: (OFString *)reason
 {
 	self = [super init];
 

@@ -65,12 +65,12 @@ OF_ASSUME_NONNULL_BEGIN
 OF_ASSUME_NONNULL_END
 
 @implementation X509Certificate
-- init
+- (instancetype)init
 {
 	OF_INVALID_INIT_METHOD
 }
 
-- initWithFile: (OFString *)path
+- (instancetype)initWithFile: (OFString *)path
 {
 	self = [super init];
 
@@ -93,7 +93,7 @@ OF_ASSUME_NONNULL_END
 	return self;
 }
 
-- initWithX509Struct: (X509 *)certificate
+- (instancetype)initWithX509Struct: (X509 *)certificate
 {
 	self = [super init];
 
@@ -213,8 +213,7 @@ OF_ASSUME_NONNULL_END
 				list = [types objectForKey: key];
 				if (list == nil) {
 					list = [OFList list];
-					[types setObject: list
-						  forKey: key];
+					[types setObject: list forKey: key];
 				}
 
 				[list appendObject:
@@ -288,9 +287,8 @@ OF_ASSUME_NONNULL_END
 {
 	void *pool = objc_autoreleasePoolPush();
 
-	for (OFString *name in [[self subject] objectForKey: OID_commonName]) {
-		if ([self X509_isAssertedDomain: name
-				    equalDomain: domain]) {
+	for (OFString *name in [self.subject objectForKey: OID_commonName]) {
+		if ([self X509_isAssertedDomain: name equalDomain: domain]) {
 			objc_autoreleasePoolPop(pool);
 			return true;
 		}
@@ -305,9 +303,8 @@ OF_ASSUME_NONNULL_END
 	void *pool = objc_autoreleasePoolPush();
 
 	for (OFString *name in
-	    [[self subjectAlternativeName] objectForKey: @"dNSName"]) {
-		if ([self X509_isAssertedDomain: name
-				    equalDomain: domain]) {
+	    [self.subjectAlternativeName objectForKey: @"dNSName"]) {
+		if ([self X509_isAssertedDomain: name equalDomain: domain]) {
 			objc_autoreleasePoolPop(pool);
 			return true;
 		}
@@ -324,7 +321,7 @@ OF_ASSUME_NONNULL_END
 	void *pool = objc_autoreleasePoolPush();
 	OFDictionary *SANs = self.subjectAlternativeName;
 	OFList *assertedNames = [[SANs objectForKey: @"otherName"]
-				       objectForKey: OID_SRVName];
+	    objectForKey: OID_SRVName];
 
 	if (![service hasPrefix: @"_"])
 		service = [service stringByPrependingString: @"_"];
@@ -377,7 +374,7 @@ OF_ASSUME_NONNULL_END
 	domain = [domain substringWithRange:
 	    of_range(firstDot + 1, domain.length - firstDot - 1)];
 
-	if (![asserted caseInsensitiveCompare: domain])
+	if ([asserted caseInsensitiveCompare: domain] == 0)
 		return true;
 
 	return false;
@@ -398,8 +395,7 @@ OF_ASSUME_NONNULL_END
 		key = [self X509_stringFromASN1Object: obj];
 
 		if ([dict objectForKey: key] == nil)
-			[dict setObject: [OFList list]
-				 forKey: key];
+			[dict setObject: [OFList list] forKey: key];
 
 		value = [self X509_stringFromASN1String: str];
 		[[dict objectForKey: key] appendObject: value];
@@ -453,12 +449,12 @@ OF_ASSUME_NONNULL_END
 @end
 
 @implementation X509OID
-- init
+- (instancetype)init
 {
 	OF_INVALID_INIT_METHOD
 }
 
-- initWithUTF8String: (const char *)string
+- (instancetype)initWithUTF8String: (const char *)string
 {
 	self = [super init];
 
@@ -504,7 +500,7 @@ OF_ASSUME_NONNULL_END
 	return _string.hash;
 }
 
-- copy
+- (id)copy
 {
 	return [self retain];
 }

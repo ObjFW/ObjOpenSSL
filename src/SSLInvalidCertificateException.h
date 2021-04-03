@@ -35,8 +35,8 @@ OF_ASSUME_NONNULL_BEGIN
 
 + (instancetype)exception;
 + (instancetype)exceptionWithReason: (OFString *)reason;
-- init OF_UNAVAILABLE;
-- initWithReason: (OFString *)reason OF_DESIGNATED_INITIALIZER;
+- (instancetype)init OF_UNAVAILABLE;
+- (instancetype)initWithReason: (OFString *)reason OF_DESIGNATED_INITIALIZER;
 @end
 
 OF_ASSUME_NONNULL_END
