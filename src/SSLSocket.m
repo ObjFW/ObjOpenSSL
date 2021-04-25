@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
- *     Jonathan Schleifer <js@nil.im>
+ * Copyright (c) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+ *               2021, Jonathan Schleifer <js@nil.im>
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
  * Copyright (c) 2011, Jos Kuijpers <jos@kuijpersvof.nl>
  *
@@ -41,21 +41,7 @@
 # pragma clang diagnostic pop
 #endif
 
-#import <ObjFW/OFThread.h>
-#import <ObjFW/OFHTTPRequest.h>
-#import <ObjFW/OFData.h>
-#import <ObjFW/OFLocale.h>
-
-#import <ObjFW/OFAcceptFailedException.h>
-#import <ObjFW/OFInitializationFailedException.h>
-#import <ObjFW/OFInvalidArgumentException.h>
-#import <ObjFW/OFNotOpenException.h>
-#import <ObjFW/OFOutOfRangeException.h>
-#import <ObjFW/OFReadFailedException.h>
-#import <ObjFW/OFWriteFailedException.h>
-
-#import <ObjFW/macros.h>
-#import <ObjFW/mutex.h>
+#import <ObjFW/ObjFW.h>
 
 #import "SSLSocket.h"
 #import "X509Certificate.h"
@@ -68,7 +54,7 @@
 #endif
 
 static SSL_CTX *ctx;
-static of_mutex_t *ssl_mutexes;
+static OFPlainMutex *SSLMutexes;
 
 static unsigned long
 threadID(void)
@@ -85,9 +71,9 @@ lockingCallback(int mode, int n, const char *file, int line)
 	 * release it otherwise.
 	 */
 	if (mode & CRYPTO_LOCK)
-		of_mutex_lock(&ssl_mutexes[n]);
+		OFEnsure(OFPlainMutexLock(&SSLMutexes[n]) == 0);
 	else
-		of_mutex_unlock(&ssl_mutexes[n]);
+		OFEnsure(OFPlainMutexUnlock(&SSLMutexes[n]) == 0);
 }
 
 @interface SSLSocket ()
@@ -175,7 +161,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 
 + (void)load
 {
-	of_tls_socket_class = self;
+	OFTLSSocketClass = self;
 }
 
 + (void)initialize
@@ -191,9 +177,9 @@ lockingCallback(int mode, int n, const char *file, int line)
 
 	/* Generate number of mutexes needed */
 	m = CRYPTO_num_locks();
-	ssl_mutexes = malloc(m * sizeof(of_mutex_t));
+	SSLMutexes = OFAllocMemory(m, sizeof(OFPlainMutex));
 	for (m--; m >= 0; m--)
-		of_mutex_new(&ssl_mutexes[m]);
+		OFEnsure(OFPlainMutexNew(&SSLMutexes[m]) == 0);
 
 	CRYPTO_set_locking_callback(&lockingCallback);
 	/* OpenSSL >= 1.1 defines the line above to a nop */
@@ -255,18 +241,17 @@ lockingCallback(int mode, int n, const char *file, int line)
 
 - (void)SSL_startTLSWithExpectedHost: (OFString *)host port: (uint16_t)port
 {
-	of_string_encoding_t encoding;
+	OFStringEncoding encoding;
 
 	if ((_SSL = SSL_new(ctx)) == NULL || SSL_set_fd(_SSL, _socket) != 1) {
 		unsigned long error = ERR_get_error();
 
 		[super close];
 
-		@throw [SSLConnectionFailedException
-		    exceptionWithHost: host
-				 port: port
-			       socket: self
-			     SSLError: error];
+		@throw [SSLConnectionFailedException exceptionWithHost: host
+								  port: port
+								socket: self
+							      SSLError: error];
 	}
 
 	if (SSL_set_tlsext_host_name(_SSL, host.UTF8String) != 1) {
@@ -351,7 +336,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 
 - (void)asyncConnectToHost: (OFString *)host
 		      port: (uint16_t)port
-	       runLoopMode: (of_run_loop_mode_t)runLoopMode
+	       runLoopMode: (OFRunLoopMode)runLoopMode
 {
 	void *pool = objc_autoreleasePoolPush();
 
@@ -368,8 +353,8 @@ lockingCallback(int mode, int n, const char *file, int line)
 #ifdef OF_HAVE_BLOCKS
 - (void)asyncConnectToHost: (OFString *)host
 		      port: (uint16_t)port
-	       runLoopMode: (of_run_loop_mode_t)runLoopMode
-		     block: (of_tcp_socket_async_connect_block_t)block
+	       runLoopMode: (OFRunLoopMode)runLoopMode
+		     block: (OFTCPSocketAsyncConnectBlock)block
 {
 	[super asyncConnectToHost: host
 			     port: port
@@ -393,7 +378,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 - (instancetype)accept
 {
 	SSLSocket *client = (SSLSocket *)[super accept];
-	of_string_encoding_t encoding;
+	OFStringEncoding encoding;
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
 	    !SSL_set_fd(client->_SSL, client->_socket)) {

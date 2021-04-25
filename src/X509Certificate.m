@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, Florian Zeitz <florob@babelmonkeys.de>
- * Copyright (c) 2011, 2012, 2013, 2015, Jonathan Schleifer <js@nil.im>
+ * Copyright (c) 2011, 2012, 2013, 2015, 2021, Jonathan Schleifer <js@nil.im>
  *
  * https://fossil.nil.im/objopenssl
  *
@@ -98,8 +98,7 @@ OF_ASSUME_NONNULL_END
 	self = [super init];
 
 	@try {
-		_certificate = X509_dup(certificate);
-		if (_certificate == NULL)
+		if ((_certificate = X509_dup(certificate)) == NULL)
 			@throw [OFInitializationFailedException
 			    exceptionWithClass: self.class];
 	} @catch (id e) {
@@ -332,7 +331,7 @@ OF_ASSUME_NONNULL_END
 	for (OFString *name in assertedNames) {
 		if ([name hasPrefix: service]) {
 			OFString *asserted;
-			asserted = [name substringWithRange: of_range(
+			asserted = [name substringWithRange: OFRangeMake(
 			    serviceLength, name.length - serviceLength)];
 			if ([self X509_isAssertedDomain: asserted
 					    equalDomain: domain]) {
@@ -358,21 +357,21 @@ OF_ASSUME_NONNULL_END
 
 	size_t firstDot;
 
-	if ([asserted caseInsensitiveCompare: domain] == OF_ORDERED_SAME)
+	if ([asserted caseInsensitiveCompare: domain] == OFOrderedSame)
 		return true;
 
 	if (![asserted hasPrefix: @"*."])
 		return false;
 
 	asserted = [asserted substringWithRange:
-	    of_range(2, asserted.length - 2)];
+	    OFRangeMake(2, asserted.length - 2)];
 
 	firstDot = [domain rangeOfString: @"."].location;
-	if (firstDot == OF_NOT_FOUND)
+	if (firstDot == OFNotFound)
 		return false;
 
 	domain = [domain substringWithRange:
-	    of_range(firstDot + 1, domain.length - firstDot - 1)];
+	    OFRangeMake(firstDot + 1, domain.length - firstDot - 1)];
 
 	if ([asserted caseInsensitiveCompare: domain] == 0)
 		return true;
@@ -412,19 +411,19 @@ OF_ASSUME_NONNULL_END
 {
 	X509OID *ret;
 	int length, bufferLength = 256;
-	char *buffer = of_alloc(1, bufferLength);
+	char *buffer = OFAllocMemory(1, bufferLength);
 
 	@try {
 		while ((length = OBJ_obj2txt(buffer, bufferLength, object,
 		    1)) > bufferLength) {
 			bufferLength = length;
-			buffer = of_realloc(buffer, 1, bufferLength);
+			buffer = OFResizeMemory(buffer, 1, bufferLength);
 		}
 
 		ret = [[[X509OID alloc]
 		    initWithUTF8String: buffer] autorelease];
 	} @finally {
-		free(buffer);
+		OFFreeMemory(buffer);
 	}
 
 	return ret;
