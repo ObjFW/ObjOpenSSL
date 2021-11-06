@@ -37,19 +37,20 @@ OF_ASSUME_NONNULL_BEGIN
 
 @class X509Certificate;
 
-@interface SSLSocket: OFTCPSocket <OFTLSSocket>
+@interface SSLSocket: OFTLSSocket
 {
 	SSL *_SSL;
 	OFString *_certificateFile, *_privateKeyFile;
 	const char *_privateKeyPassphrase;
-	bool _verifiesCertificates, _requestsClientCertificates;
+	bool _requestsClientCertificates;
 }
 
+@property (copy, nonatomic) OFString *certificateFile, *privateKeyFile;
+@property (nonatomic) const char *privateKeyPassphrase;
 @property (nonatomic) bool requestsClientCertificates;
 @property OF_NULLABLE_PROPERTY (readonly, nonatomic)
     X509Certificate *peerCertificate;
 
-- (instancetype)initWithSocket: (OFTCPSocket *)socket;
 - (OFData *)channelBindingDataWithType: (OFString *)type;
 - (nullable X509Certificate *)peerCertificate;
 - (void)verifyPeerCertificate;

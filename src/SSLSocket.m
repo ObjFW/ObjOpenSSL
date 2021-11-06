@@ -77,78 +77,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 }
 
 @interface SSLSocket ()
-- (void)SSL_startTLSWithExpectedHost: (OFString *)host port: (uint16_t)port;
 - (void)SSL_super_close;
-@end
-
-@interface SSLSocket_ConnectDelegate: OFObject <OFTLSSocketDelegate>
-{
-	SSLSocket *_socket;
-	OFString *_host;
-	uint16_t _port;
-	id <OFTLSSocketDelegate> _delegate;
-}
-
-- (instancetype)initWithSocket: (SSLSocket *)sock
-			  host: (OFString *)host
-			  port: (uint16_t)port
-		      delegate: (id <OFTLSSocketDelegate>)delegate;
-@end
-
-@implementation SSLSocket_ConnectDelegate
-- (instancetype)initWithSocket: (SSLSocket *)sock
-			  host: (OFString *)host
-			  port: (uint16_t)port
-		      delegate: (id <OFTLSSocketDelegate>)delegate
-{
-	self = [super init];
-
-	@try {
-		_socket = [sock retain];
-		_host = [host copy];
-		_port = port;
-		_delegate = [delegate retain];
-
-		_socket.delegate = self;
-	} @catch (id e) {
-		[self release];
-		@throw e;
-	}
-
-	return self;
-}
-
-- (void)dealloc
-{
-	if (_socket.delegate == self)
-		_socket.delegate = _delegate;
-
-	[_socket release];
-	[_delegate release];
-
-	[super dealloc];
-}
-
--     (void)socket: (OFTCPSocket *)sock
-  didConnectToHost: (OFString *)host
-	      port: (uint16_t)port
-	 exception: (id)exception
-{
-	if (exception == nil) {
-		@try {
-			[(SSLSocket *)sock SSL_startTLSWithExpectedHost: _host
-								   port: _port];
-		} @catch (id e) {
-			exception = e;
-		}
-	}
-
-	_socket.delegate = _delegate;
-	[_delegate    socket: sock
-	    didConnectToHost: host
-			port: port
-		   exception: exception];
-}
 @end
 
 @implementation SSLSocket
@@ -156,12 +85,11 @@ lockingCallback(int mode, int n, const char *file, int line)
 @synthesize certificateFile = _certificateFile;
 @synthesize privateKeyFile = _privateKeyFile;
 @synthesize privateKeyPassphrase = _privateKeyPassphrase;
-@synthesize verifiesCertificates = _verifiesCertificates;
 @synthesize requestsClientCertificates = _requestsClientCertificates;
 
 + (void)load
 {
-	OFTLSSocketClass = self;
+	OFTLSSocketImplementation = self;
 }
 
 + (void)initialize
@@ -202,30 +130,6 @@ lockingCallback(int mode, int n, const char *file, int line)
 		    exceptionWithClass: self];
 }
 
-- (instancetype)init
-{
-	self = [super init];
-
-	_verifiesCertificates = true;
-
-	return self;
-}
-
-- (instancetype)initWithSocket: (OFTCPSocket *)socket
-{
-	self = [self init];
-
-	@try {
-		if ((_socket = dup(socket->_socket)) < 0)
-			@throw [OFInitializationFailedException exception];
-	} @catch (id e) {
-		[self release];
-		@throw e;
-	}
-
-	return self;
-}
-
 - (void)dealloc
 {
 	SSL *SSL_ = _SSL;
@@ -239,7 +143,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 		SSL_free(SSL_);
 }
 
-- (void)SSL_startTLSWithExpectedHost: (OFString *)host port: (uint16_t)port
+- (void)startTLSForHost: (OFString *)host port: (uint16_t)port
 {
 	OFStringEncoding encoding;
 
@@ -329,55 +233,9 @@ lockingCallback(int mode, int n, const char *file, int line)
 	}
 }
 
-- (void)startTLSWithExpectedHost: (OFString *)host
-{
-	[self SSL_startTLSWithExpectedHost: host port: 0];
-}
-
-- (void)asyncConnectToHost: (OFString *)host
-		      port: (uint16_t)port
-	       runLoopMode: (OFRunLoopMode)runLoopMode
-{
-	void *pool = objc_autoreleasePoolPush();
-
-	[[[SSLSocket_ConnectDelegate alloc]
-	    initWithSocket: self
-		      host: host
-		      port: port
-		  delegate: _delegate] autorelease];
-	[super asyncConnectToHost: host port: port runLoopMode: runLoopMode];
-
-	objc_autoreleasePoolPop(pool);
-}
-
-#ifdef OF_HAVE_BLOCKS
-- (void)asyncConnectToHost: (OFString *)host
-		      port: (uint16_t)port
-	       runLoopMode: (OFRunLoopMode)runLoopMode
-		     block: (OFTCPSocketAsyncConnectBlock)block
-{
-	[super asyncConnectToHost: host
-			     port: port
-		      runLoopMode: runLoopMode
-			    block: ^ (id exception) {
-		if (exception == nil) {
-			@try {
-				[self SSL_startTLSWithExpectedHost: host
-							      port: port];
-			} @catch (id e) {
-				block(e);
-				return;
-			}
-		}
-
-		block(exception);
-	}];
-}
-#endif
-
 - (instancetype)accept
 {
-	SSLSocket *client = (SSLSocket *)[super accept];
+	SSLSocket *client = [self TCPAccept];
 	OFStringEncoding encoding;
 
 	if ((client->_SSL = SSL_new(ctx)) == NULL ||
@@ -433,7 +291,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	 * to establish a SOCKS5 connection before negotiating an SSL session.
 	 */
 	if (_SSL == NULL)
-		return [super lowlevelReadIntoBuffer: buffer length: length];
+		return [self lowlevelTCPReadIntoBuffer: buffer length: length];
 
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exception];
@@ -476,7 +334,7 @@ lockingCallback(int mode, int n, const char *file, int line)
 	 * accident.
 	 */
 	if (_SSL == NULL)
-		return [super lowlevelWriteBuffer: buffer length: length];
+		return [self lowlevelTCPWriteBuffer: buffer length: length];
 
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotOpenException exceptionWithObject: self];
@@ -493,51 +351,12 @@ lockingCallback(int mode, int n, const char *file, int line)
 	return bytesWritten;
 }
 
-- (bool)hasDataInReadBuffer
+- (bool)lowlevelIsAtEndOfStream
 {
 	if (_SSL != NULL && SSL_pending(_SSL) > 0)
-		return true;
+		return false;
 
-	return super.hasDataInReadBuffer;
-}
-
-- (void)setCertificateFile: (OFString *)certificateFile
-		forSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (OFString *)certificateFileForSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (void)setPrivateKeyFile: (OFString *)privateKeyFile
-	       forSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (OFString *)privateKeyFileForSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (void)setPrivateKeyPassphrase: (const char *)privateKeyPassphrase
-		     forSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
-}
-
-- (const char *)privateKeyPassphraseForSNIHost: (OFString *)SNIHost
-{
-	/* TODO */
-	OF_UNRECOGNIZED_SELECTOR
+	return [self lowlevelTCPIsAtEndOfStream];
 }
 
 - (OFData *)channelBindingDataWithType: (OFString *)type
