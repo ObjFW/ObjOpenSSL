@@ -284,14 +284,8 @@ lockingCallback(int mode, int n, const char *file, int line)
 {
 	ssize_t ret;
 
-	/*
-	 * There is no SSL session yet. However, it might be necessary to read
-	 * from and write to the socket before negotiating an SSL session: For
-	 * example, the socket might be connected to a SOCKS5 proxy and needs
-	 * to establish a SOCKS5 connection before negotiating an SSL session.
-	 */
 	if (_SSL == NULL)
-		return [self lowlevelTCPReadIntoBuffer: buffer length: length];
+		@throw [OFNotOpenException exceptionWithObject: self];
 
 	if (length > INT_MAX)
 		@throw [OFOutOfRangeException exception];
@@ -323,18 +317,8 @@ lockingCallback(int mode, int n, const char *file, int line)
 {
 	int bytesWritten;
 
-	/*
-	 * There is no SSL session yet. However, it might be necessary to read
-	 * from and write to the socket before negotiating an SSL session: For
-	 * example, the socket might be connected to a SOCKS5 proxy and needs
-	 * to establish a SOCKS5 connection before negotiating an SSL session.
-	 *
-	 * TODO: Think of a way to make this safer, so that it's impossible to
-	 * forget to establish an SSL session and then send unencrypted data by
-	 * accident.
-	 */
 	if (_SSL == NULL)
-		return [self lowlevelTCPWriteBuffer: buffer length: length];
+		@throw [OFNotOpenException exceptionWithObject: self];
 
 	if (_socket == INVALID_SOCKET)
 		@throw [OFNotOpenException exceptionWithObject: self];
@@ -351,12 +335,12 @@ lockingCallback(int mode, int n, const char *file, int line)
 	return bytesWritten;
 }
 
-- (bool)lowlevelIsAtEndOfStream
+- (bool)hasDataInReadBuffer
 {
 	if (_SSL != NULL && SSL_pending(_SSL) > 0)
-		return false;
+		return true;
 
-	return [self lowlevelTCPIsAtEndOfStream];
+	return [super hasDataInReadBuffer];
 }
 
 - (OFData *)channelBindingDataWithType: (OFString *)type
